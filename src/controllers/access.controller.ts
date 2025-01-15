@@ -3,6 +3,12 @@ import { CREATED, SuccessResponse } from '~/core/success.response'
 import AccessService from '~/services/access.service'
 
 class AccessController {
+  logout = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: 'Logout successfully',
+      metadata: await AccessService.logout(req.keyStore)
+    }).send(res)
+  }
   login = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: 'Login successfully',

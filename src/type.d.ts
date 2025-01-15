@@ -1,9 +1,13 @@
 import { ApiKey } from './types/apikey'
+import { KeyInfo } from './types/keytoken'
 
 declare global {
   namespace Express {
     interface Request {
       objKey: ApiKey
+      refreshToken: string
+      keyStore: KeyInfo
+      user: JWT.JwtPayload
     }
   }
   namespace NodeJS {

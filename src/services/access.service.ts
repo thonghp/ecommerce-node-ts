@@ -1,12 +1,13 @@
 import bycrypt from 'bcrypt'
 import _ from 'lodash'
 import crypto from 'node:crypto'
-import createTokenPair from '~/auth/authUtils'
 import { AuthFailureError, BadRequestError } from '~/core/error.response'
 import shopModel from '~/models/shop.model'
+import { KeyInfo } from '~/types/keytoken'
 import { User } from '~/types/shop'
 import KeyTokenService from './keytoken.service'
 import findByEmail from './shop.service'
+import { createTokenPair } from '~/auth/authUtils'
 
 const RoleShop = {
   SHOP: 'SHOP', // ngoài thực tế người ta dùng là các con số như 0001 để đại diện cho role này
@@ -16,6 +17,12 @@ const RoleShop = {
 }
 
 class AccessService {
+  static logout = async (keyStore: KeyInfo) => {
+    const delKey = await KeyTokenService.removeKeyById(keyStore._id)
+
+    return delKey
+  }
+
   static login = async ({
     email,
     password

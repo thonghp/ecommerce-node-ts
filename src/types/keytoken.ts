@@ -8,5 +8,6 @@ export type CreateKey = {
 }
 
 export type KeyInfo = CreateKey & {
+  _id: string
   refreshTokenUsed: []
 }

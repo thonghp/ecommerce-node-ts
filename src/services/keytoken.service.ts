@@ -1,5 +1,6 @@
-import keytokenModel from '../models/keytoken.model'
-import { CreateKey, KeyInfo } from '../types/keytoken'
+import { Types } from 'mongoose'
+import keytokenModel from '~/models/keytoken.model'
+import { CreateKey, KeyInfo } from '~/types/keytoken'
 
 class KeyTokenService {
   /**
@@ -20,6 +21,16 @@ class KeyTokenService {
       console.error(`Error: ${error}`)
       throw error
     }
+  }
+
+  static findByUserId = async (userId: string): Promise<KeyInfo | null> => {
+    return await keytokenModel.findOne({ user: Types.ObjectId.createFromHexString(userId) })
+  }
+
+  static removeKeyById = async (id: string) => {
+    const delKey = await keytokenModel.deleteOne({ _id: id })
+
+    return delKey
   }
 }
 
