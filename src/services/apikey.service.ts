@@ -12,7 +12,7 @@ const createXApiKey = async (): Promise<ApiKey> => {
 }
 
 const findById = async (key: string): Promise<ApiKey | null> => {
-  const objKey = await apiKeyModel.findOne({ key, status: true }).lean<ApiKey>()
+  const objKey = await apiKeyModel.findOne({ key, status: true }).lean<ApiKey>().exec()
 
   return objKey
 }

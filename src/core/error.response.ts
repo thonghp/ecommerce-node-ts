@@ -14,4 +14,10 @@ class BadRequestError extends ErrorResponse {
   }
 }
 
-export { ErrorResponse, BadRequestError }
+class AuthFailureError extends ErrorResponse {
+  constructor(message = reasonPhrases.UNAUTHORIZED, status = statusCode.UNAUTHORIZED) {
+    super(message, status)
+  }
+}
+
+export { ErrorResponse, BadRequestError, AuthFailureError }
