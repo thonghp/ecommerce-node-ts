@@ -23,14 +23,41 @@ class KeyTokenService {
     }
   }
 
-  static findByUserId = async (userId: string): Promise<KeyInfo | null> => {
-    return await keytokenModel.findOne({ user: Types.ObjectId.createFromHexString(userId) })
+  static findByUserId = async (userId: string) => {
+    return await keytokenModel
+      .findOne({ user: Types.ObjectId.createFromHexString(userId) })
+      .lean<KeyInfo>()
+      .exec()
   }
 
-  static removeKeyById = async (id: string) => {
+  static removeKeyById = async (id: Types.ObjectId) => {
     const delKey = await keytokenModel.deleteOne({ _id: id })
 
     return delKey
+  }
+
+  static findByRefreshToken = async (refreshToken: string): Promise<KeyInfo | null> => {
+    return await keytokenModel.findOne({ refreshToken })
+  }
+
+  static findRefeshTokenUsed = async (refreshToken: string): Promise<KeyInfo | null> => {
+    return await keytokenModel.findOne({ refreshTokenUsed: refreshToken }).lean<KeyInfo>()
+  }
+
+  static deleteByUserId = async (userId: Types.ObjectId) => {
+    return await keytokenModel.deleteOne({ user: userId })
+  }
+
+  static updateRefreshToken = async (id: Types.ObjectId, refreshToken: string, refreshTokenUsed: string) => {
+    return await keytokenModel.updateOne(
+      {
+        _id: id
+      },
+      {
+        $set: { refreshToken },
+        $addToSet: { refreshTokenUsed }
+      }
+    )
   }
 }
 

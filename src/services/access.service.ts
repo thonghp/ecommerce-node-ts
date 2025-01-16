@@ -1,13 +1,14 @@
 import bycrypt from 'bcrypt'
 import _ from 'lodash'
 import crypto from 'node:crypto'
-import { AuthFailureError, BadRequestError } from '~/core/error.response'
+import { createTokenPair } from '~/auth/authUtils'
+import { AuthFailureError, BadRequestError, ForbiddenError } from '~/core/error.response'
 import shopModel from '~/models/shop.model'
 import { KeyInfo } from '~/types/keytoken'
+import { JwtUserPayload } from '~/types/jwtUserPayload'
 import { User } from '~/types/shop'
 import KeyTokenService from './keytoken.service'
 import findByEmail from './shop.service'
-import { createTokenPair } from '~/auth/authUtils'
 
 const RoleShop = {
   SHOP: 'SHOP', // ngoài thực tế người ta dùng là các con số như 0001 để đại diện cho role này
@@ -17,6 +18,42 @@ const RoleShop = {
 }
 
 class AccessService {
+  static handleRefreshToken = async ({
+    keyStore,
+    user,
+    refreshToken
+  }: {
+    keyStore: KeyInfo
+    user: JwtUserPayload
+    refreshToken: string
+  }) => {
+    const { userId, email } = user
+    if (keyStore.refreshTokenUsed.includes(refreshToken)) {
+      await KeyTokenService.deleteByUserId(userId)
+      throw new ForbiddenError('Something wrong happened !! Pls re-login')
+    }
+
+    if (keyStore.refreshToken !== refreshToken) {
+      throw new AuthFailureError('Invalid token')
+    }
+    const isExistingUser = await findByEmail({ email })
+    if (!isExistingUser) {
+      throw new AuthFailureError('Shop not registered')
+    }
+    const tokens = await createTokenPair({
+      payload: { userId, email },
+      privateKey: keyStore.privateKey,
+      publicKey: keyStore.publicKey
+    })
+
+    await KeyTokenService.updateRefreshToken(keyStore._id, tokens.refreshToken, refreshToken)
+
+    return {
+      user,
+      tokens
+    }
+  }
+
   static logout = async (keyStore: KeyInfo) => {
     const delKey = await KeyTokenService.removeKeyById(keyStore._id)
 

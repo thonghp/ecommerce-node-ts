@@ -1,5 +1,5 @@
 import { Response } from 'express'
-import { ResponseData } from '~/types/response'
+import { ResponseParams } from '~/types/successResponse'
 import reasonPhrases from '~/utils/reasonPhrases'
 import statusCode from '~/utils/statusCode'
 
@@ -8,7 +8,7 @@ class SuccessResponse {
   status: number
   reasonStatus: string
   metadata: object
-  constructor({ message, status = statusCode.OK, reasonStatus = reasonPhrases.OK, metadata }: ResponseData) {
+  constructor({ message, status = statusCode.OK, reasonStatus = reasonPhrases.OK, metadata }: ResponseParams) {
     this.message = message || reasonStatus
     this.status = status
     this.metadata = metadata
@@ -24,7 +24,12 @@ class SuccessResponse {
 }
 
 class CREATED extends SuccessResponse {
-  constructor({ message, status = statusCode.CREATED, reasonStatus = reasonPhrases.CREATED, metadata }: ResponseData) {
+  constructor({
+    message,
+    status = statusCode.CREATED,
+    reasonStatus = reasonPhrases.CREATED,
+    metadata
+  }: ResponseParams) {
     super({ message, status, reasonStatus, metadata })
   }
 }

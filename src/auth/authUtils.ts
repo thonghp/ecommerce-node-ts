@@ -3,7 +3,8 @@ import JWT from 'jsonwebtoken'
 import { AuthFailureError, NotFoundError } from '~/core/error.response'
 import asyncHandler from '~/helpers/asyncHandler'
 import KeyTokenService from '~/services/keytoken.service'
-import { CreateTokenPair, TokenPair } from '~/types/authKey'
+import { TokenGenerationParams, TokenPair } from '~/types/token'
+import { JwtUserPayload } from '~/types/jwtUserPayload'
 
 const HEADER = {
   API_KEY: 'x-api-key',
@@ -15,7 +16,7 @@ const HEADER = {
 /**
  * Get payload plus private key and public key to sign jwt to create access and refresh token pair
  */
-const createTokenPair = async ({ payload, privateKey, publicKey }: CreateTokenPair): Promise<TokenPair> => {
+const createTokenPair = async ({ payload, privateKey, publicKey }: TokenGenerationParams): Promise<TokenPair> => {
   try {
     const accessToken = await JWT.sign(payload, publicKey, {
       expiresIn: '2 days'
@@ -54,13 +55,14 @@ const authentication = asyncHandler(async (req: Request, res: Response, next: Ne
   if (req.headers[HEADER.REFRESHTOKEN]) {
     try {
       const refreshToken = req.headers[HEADER.REFRESHTOKEN] as string
-      const decodeUser = JWT.verify(refreshToken, keyStore.privateKey) as JWT.JwtPayload
-      if (userId !== decodeUser.userId) {
+      const decodeUser = JWT.verify(refreshToken, keyStore.privateKey) as JwtUserPayload
+      if (userId !== decodeUser.userId.toString()) {
         throw new AuthFailureError('Invalid userId')
       }
       req.keyStore = keyStore
       req.user = decodeUser
       req.refreshToken = refreshToken
+      return next()
     } catch (error) {
       console.error(`Error: ${error}`)
       throw error

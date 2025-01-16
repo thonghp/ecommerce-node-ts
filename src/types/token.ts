@@ -1,12 +1,12 @@
-import { Schema } from 'mongoose'
+import { Types } from 'mongoose'
 
 export type TokenPair = {
   accessToken: string
   refreshToken: string
 }
-export type CreateTokenPair = {
+export type TokenGenerationParams = {
   payload: {
-    userId: Schema.Types.ObjectId
+    userId: Types.ObjectId
     email: string
   }
   privateKey: string

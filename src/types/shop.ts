@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose'
+import { Types } from 'mongoose'
 
 export type User = {
   name: string
@@ -7,7 +7,7 @@ export type User = {
 }
 
 export type Shop = User & {
-  _id: Schema.Types.ObjectId
+  _id: Types.ObjectId
   status: string
   verify: boolean
   roles: string[]

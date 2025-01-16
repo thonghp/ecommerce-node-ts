@@ -1,4 +1,4 @@
-export type ResponseData = {
+export type ResponseParams = {
   message: string
   metadata: object
   status?: number

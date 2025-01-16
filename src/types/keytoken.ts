@@ -1,13 +1,13 @@
-import { Schema } from 'mongoose'
+import { Types } from 'mongoose'
 
 export type CreateKey = {
-  user: Schema.Types.ObjectId
+  user: Types.ObjectId
   privateKey: string
   publicKey: string
   refreshToken?: string
 }
 
 export type KeyInfo = CreateKey & {
-  _id: string
-  refreshTokenUsed: []
+  _id: Types.ObjectId
+  refreshTokenUsed: string[]
 }
