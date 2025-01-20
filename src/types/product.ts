@@ -14,6 +14,13 @@ export type ClothingType = {
   product_shop: Types.ObjectId
 }
 
+export type FurnitureType = {
+  brand: string
+  size?: string
+  material?: string
+  product_shop: Types.ObjectId
+}
+
 export type ProductType = {
   product_name: string
   product_thumb: string
@@ -22,5 +29,5 @@ export type ProductType = {
   product_quantity: number
   product_type: string
   product_shop: Types.ObjectId
-  product_attributes: ElectronicType | ClothingType
+  product_attributes: ElectronicType | ClothingType | FurnitureType
 }

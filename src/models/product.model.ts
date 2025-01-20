@@ -1,5 +1,5 @@
 import mongoose, { model, Schema } from 'mongoose'
-import { ClothingType, ElectronicType, ProductType } from '~/types/product'
+import { ClothingType, ElectronicType, FurnitureType, ProductType } from '~/types/product'
 
 const DOCUMENT_NAME_PRODUCT = 'Product'
 const COLLECTION_NAME_PRODUCT = 'Products'
@@ -9,6 +9,9 @@ const COLLECTION_NAME_CLOTHING = 'Clothes'
 
 const DOCUMENT_NAME_ELECTRONIC = 'Electronic'
 const COLLECTION_NAME_ELECTRONIC = 'Electronics'
+
+const DOCUMENT_NAME_FURNITURE = 'Furniture'
+const COLLECTION_NAME_FURNITURE = 'Furnitures'
 
 const productSchema = new Schema<ProductType>(
   {
@@ -87,8 +90,28 @@ const electronicSchema = new Schema<ElectronicType>(
   }
 )
 
+const furnitureSchema = new Schema<FurnitureType>(
+  {
+    brand: {
+      type: String,
+      required: true
+    },
+    size: String,
+    material: String,
+    product_shop: {
+      type: Schema.Types.ObjectId,
+      ref: 'Shop'
+    }
+  },
+  {
+    timestamps: true,
+    collection: COLLECTION_NAME_FURNITURE
+  }
+)
+
 const productModel = mongoose.models[DOCUMENT_NAME_PRODUCT] || model(DOCUMENT_NAME_PRODUCT, productSchema)
 const clothingModel = mongoose.models[DOCUMENT_NAME_CLOTHING] || model(DOCUMENT_NAME_CLOTHING, clothingSchema)
-const electronicmodel = mongoose.models[DOCUMENT_NAME_ELECTRONIC] || model(DOCUMENT_NAME_ELECTRONIC, electronicSchema)
+const electronicModel = mongoose.models[DOCUMENT_NAME_ELECTRONIC] || model(DOCUMENT_NAME_ELECTRONIC, electronicSchema)
+const furnitureModel = mongoose.models[DOCUMENT_NAME_FURNITURE] || model(DOCUMENT_NAME_FURNITURE, furnitureSchema)
 
-export { productModel, clothingModel, electronicmodel }
+export { productModel, clothingModel, electronicModel, furnitureModel }
