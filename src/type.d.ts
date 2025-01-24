@@ -1,7 +1,6 @@
 import { ApiKey } from './types/apikey'
-import { KeyInfo } from './types/keytoken'
 import { JwtUserPayload } from './types/jwtUserPayload'
-import { ProductType } from './types/product'
+import { KeyInfo } from './types/keytoken'
 
 declare global {
   namespace Express {
@@ -10,7 +9,8 @@ declare global {
       refreshToken: string
       keyStore: KeyInfo
       user: JwtUserPayload
-      body: ProductType | KeyInfo | unknown
+      body: unknown
+      params: string
     }
   }
   namespace NodeJS {

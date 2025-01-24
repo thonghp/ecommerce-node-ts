@@ -1,6 +1,6 @@
 export type ResponseParams = {
   message: string
-  metadata: object
+  metadata: unknown
   status?: number
   reasonStatus?: string
 }

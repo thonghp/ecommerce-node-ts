@@ -22,12 +22,18 @@ export type FurnitureType = {
 }
 
 export type ProductType = {
+  _id: Types.ObjectId
   product_name: string
   product_thumb: string
   product_description?: string
+  product_slug: string
   product_price: number
   product_quantity: number
   product_type: string
   product_shop: Types.ObjectId
   product_attributes: ElectronicType | ClothingType | FurnitureType
+  product_ratingAverage: number
+  product_variations: string[]
+  isDraft: boolean
+  isPublished: boolean
 }

@@ -1,7 +1,15 @@
 import { Types } from 'mongoose'
 import { BadRequestError } from '~/core/error.response'
 import { clothingModel, electronicModel, furnitureModel, productModel } from '~/models/product.model'
+import {
+  findAllDraftsForShop,
+  findAllPublishsForShop,
+  publishProductByShop,
+  searchProductByUser,
+  unpublishProductByShop
+} from '~/models/repositories/product.repo'
 import { ClothingType, ElectronicType, FurnitureType, ProductType } from '~/types/product'
+import { ProductPaginationPayload, ProductActionPayload } from '~/types/productRepo'
 
 // Stratogy class
 type classRefType = new (payload: ProductType) => Product
@@ -25,6 +33,28 @@ class ProductFactoryStrategy {
       throw new BadRequestError(`Invalid product types ${type}`)
     }
     return new productClass(payload).createProduct()
+  }
+
+  static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }: ProductPaginationPayload) {
+    const query = { product_shop, isDraft: true }
+    return await findAllDraftsForShop({ query, limit, skip })
+  }
+
+  static async findAllPublishsForShop({ product_shop, limit = 50, skip = 0 }: ProductPaginationPayload) {
+    const query = { product_shop, isPublished: true }
+    return await findAllPublishsForShop({ query, limit, skip })
+  }
+
+  static async publishProductByShop({ product_id, product_shop }: ProductActionPayload) {
+    return await publishProductByShop({ product_id, product_shop })
+  }
+
+  static async unpublishProductByShop({ product_id, product_shop }: ProductActionPayload) {
+    return await unpublishProductByShop({ product_id, product_shop })
+  }
+
+  static async searchProduct(keySearch: string) {
+    return await searchProductByUser(keySearch)
   }
 }
 
@@ -57,7 +87,7 @@ class Product {
     this.product_shop = product_shop
     this.product_attributes = product_attributes
   }
-  async createProduct(product_id?: Types.ObjectId) {
+  async createProduct(product_id?: Types.ObjectId): Promise<ProductType> {
     return await productModel.create({
       ...this,
       _id: product_id

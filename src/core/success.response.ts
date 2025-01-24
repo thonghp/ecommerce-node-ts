@@ -7,7 +7,7 @@ class SuccessResponse {
   message: string
   status: number
   reasonStatus: string
-  metadata: object
+  metadata: unknown
   constructor({ message, status = statusCode.OK, reasonStatus = reasonPhrases.OK, metadata }: ResponseParams) {
     this.message = message || reasonStatus
     this.status = status
