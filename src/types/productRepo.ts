@@ -21,3 +21,11 @@ export type ProductActionPayload = {
   product_id: string
   product_shop: Types.ObjectId
 }
+
+export type FindAllProductsInput = {
+  limit: number
+  sort: string
+  page: number
+  filter: object
+  select: string[]
+}

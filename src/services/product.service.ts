@@ -3,13 +3,15 @@ import { BadRequestError } from '~/core/error.response'
 import { clothingModel, electronicModel, furnitureModel, productModel } from '~/models/product.model'
 import {
   findAllDraftsForShop,
+  findAllProducts,
   findAllPublishsForShop,
+  findProduct,
   publishProductByShop,
   searchProductByUser,
   unpublishProductByShop
 } from '~/models/repositories/product.repo'
 import { ClothingType, ElectronicType, FurnitureType, ProductType } from '~/types/product'
-import { ProductPaginationPayload, ProductActionPayload } from '~/types/productRepo'
+import { FindAllProductsInput, ProductActionPayload, ProductPaginationPayload } from '~/types/productRepo'
 
 // Stratogy class
 type classRefType = new (payload: ProductType) => Product
@@ -55,6 +57,20 @@ class ProductFactoryStrategy {
 
   static async searchProduct(keySearch: string) {
     return await searchProductByUser(keySearch)
+  }
+
+  static async findAllProducts({
+    limit = 50,
+    sort = 'ctime',
+    page = 1,
+    filter = { isPubished: true },
+    select = []
+  }: FindAllProductsInput) {
+    return await findAllProducts({ limit, sort, page, filter, select })
+  }
+
+  static async findProduct({ product_id }: { product_id: string }) {
+    return await findProduct({ product_id, unselect: ['__v'] })
   }
 }
 

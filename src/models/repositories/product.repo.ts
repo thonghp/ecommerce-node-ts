@@ -1,7 +1,8 @@
-import { Types } from 'mongoose'
+import { SortOrder, Types } from 'mongoose'
 import { productModel } from '../product.model'
 import { ProductType } from '~/types/product'
-import { PaginationOptions, ProductActionPayload } from '~/types/productRepo'
+import { FindAllProductsInput, PaginationOptions, ProductActionPayload } from '~/types/productRepo'
+import { getSelectData, unGetSelectData } from '~/utils'
 
 const findAllDraftsForShop = async ({ query, limit, skip }: PaginationOptions) => {
   return await queryProduct({ query, limit, skip })
@@ -67,10 +68,30 @@ const searchProductByUser = async (keySearch: string) => {
   return results
 }
 
+const findAllProducts = async ({ limit, sort, page, filter, select }: FindAllProductsInput) => {
+  const skip = (page - 1) * limit
+  const sortBy: { [key: string]: SortOrder } = sort === 'ctime' ? { _id: 1 } : { _id: -1 }
+  const products = await productModel
+    .find(filter)
+    .sort(sortBy)
+    .skip(skip)
+    .limit(limit)
+    .select(getSelectData(select))
+    .lean()
+
+  return products
+}
+
+const findProduct = async ({ product_id, unselect }: { product_id: string; unselect: string[] }) => {
+  return await productModel.findById(product_id).select(unGetSelectData(unselect))
+}
+
 export {
   findAllDraftsForShop,
   findAllPublishsForShop,
   publishProductByShop,
   unpublishProductByShop,
-  searchProductByUser
+  searchProductByUser,
+  findAllProducts,
+  findProduct
 }

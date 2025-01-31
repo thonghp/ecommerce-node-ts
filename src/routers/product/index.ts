@@ -5,6 +5,8 @@ import { authentication } from '~/auth/authUtils'
 const router = Router()
 
 router.get('/search/:keySearch', asyncHandler(productController.getListSearchProducts))
+router.get('', asyncHandler(productController.findAllProducts))
+router.get('/:product_id', asyncHandler(productController.findProduct))
 
 router.use(authentication)
 router.post('', asyncHandler(productController.createProduct))

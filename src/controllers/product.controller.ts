@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { CREATED, SuccessResponse } from '~/core/success.response'
 import ProductService from '~/services/product.service'
 import { ProductType } from '~/types/product'
+import { transformQueryProducts } from '~/utils/transformQuery'
 
 class ProductController {
   createProduct = async (req: Request, res: Response, next: NextFunction) => {
@@ -57,6 +58,23 @@ class ProductController {
     new SuccessResponse({
       message: 'get list search product success!',
       metadata: await ProductService.searchProduct(req.params.keySearch)
+    }).send(res)
+  }
+
+  findAllProducts = async (req: Request, res: Response, next: NextFunction) => {
+    const queryParam = transformQueryProducts(req.query)
+    new SuccessResponse({
+      message: 'get list products success!',
+      metadata: await ProductService.findAllProducts(queryParam)
+    }).send(res)
+  }
+
+  findProduct = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: 'get product success!',
+      metadata: await ProductService.findProduct({
+        product_id: req.params.product_id
+      })
     }).send(res)
   }
 }
