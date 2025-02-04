@@ -10,6 +10,7 @@ import {
   productModel,
   ProductType
 } from '~/models/product.model'
+import { insertInventory } from '~/models/repositories/inventory.repo'
 import {
   findAllDraftsForShop,
   findAllProducts,
@@ -124,10 +125,16 @@ class Product {
     this.product_quantity = product_quantity
   }
   async createProduct(product_id?: Types.ObjectId) {
-    return await productModel.create({
-      ...this,
-      _id: product_id
-    })
+    const newProduct: ProductType = await productModel.create({ ...this, _id: product_id })
+    if (newProduct) {
+      // add product_stock in inventory
+      await insertInventory({
+        productId: newProduct._id,
+        shopId: this.product_shop,
+        stock: this.product_quantity
+      })
+    }
+    return newProduct
   }
 
   async updateProduct(product_id: string, payload?: ProductType) {
