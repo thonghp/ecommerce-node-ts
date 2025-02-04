@@ -1,4 +1,5 @@
-import { Types } from 'mongoose'
+import { Model, Types } from 'mongoose'
+import { ClothingType, ProductType, ElectronicType, FurnitureType } from '~/models/product.model'
 
 export type ProductQuery = {
   product_shop: Types.ObjectId
@@ -28,4 +29,11 @@ export type FindAllProductsInput = {
   page: number
   filter: object
   select: string[]
+}
+
+export type UpdateProductInput = {
+  product_id: string
+  payload: object
+  model: Model<ProductType | ClothingType | ElectronicType | FurnitureType>
+  isNew?: boolean
 }

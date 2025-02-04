@@ -6,10 +6,11 @@ const router = Router()
 
 router.get('/search/:keySearch', asyncHandler(productController.getListSearchProducts))
 router.get('', asyncHandler(productController.findAllProducts))
-router.get('/:product_id', asyncHandler(productController.findProduct))
+router.get('/:productId', asyncHandler(productController.findProduct))
 
 router.use(authentication)
 router.post('', asyncHandler(productController.createProduct))
+router.patch('/:productId', asyncHandler(productController.updateProduct))
 
 router.get('/drafts/all', asyncHandler(productController.getAllDraftsForShop))
 router.get('/published/all', asyncHandler(productController.getAllPublishedForShop))

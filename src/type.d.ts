@@ -1,11 +1,11 @@
-import { ApiKey } from './types/apikey'
+import { ApiKeyType } from './models/apikey.model'
 import { JwtUserPayload } from './types/jwtUserPayload'
 import { KeyInfo } from './types/keytoken'
 
 declare global {
   namespace Express {
     interface Request {
-      objKey: ApiKey
+      objKey: ApiKeyType
       refreshToken: string
       keyStore: KeyInfo
       user: JwtUserPayload

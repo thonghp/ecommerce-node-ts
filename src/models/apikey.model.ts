@@ -1,10 +1,9 @@
-import mongoose, { model, Schema } from 'mongoose'
-import { ApiKey } from '~/types/apikey'
+import mongoose, { InferSchemaType, model, Schema, Types } from 'mongoose'
 const DOCUMENT_NAME = 'ApiKey'
 const COLLECTION_NAME = 'ApiKeys'
 
 // Người dùng sẽ add cái key này add vào header service kèm theo
-const apiKeySchema = new Schema<ApiKey>(
+const apiKeySchema = new Schema(
   {
     key: {
       type: String,
@@ -31,6 +30,10 @@ const apiKeySchema = new Schema<ApiKey>(
     collection: COLLECTION_NAME
   }
 )
+
+type ApiKeySchemaType = InferSchemaType<typeof apiKeySchema>
+
+export type ApiKeyType = ApiKeySchemaType & { _id: Types.ObjectId }
 
 const apiKeyModel = mongoose.models[DOCUMENT_NAME] || model(DOCUMENT_NAME, apiKeySchema)
 

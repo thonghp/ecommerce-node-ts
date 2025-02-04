@@ -1,6 +1,15 @@
 import { Types } from 'mongoose'
 import { BadRequestError } from '~/core/error.response'
-import { clothingModel, electronicModel, furnitureModel, productModel } from '~/models/product.model'
+import {
+  clothingModel,
+  ClothingType,
+  electronicModel,
+  ElectronicType,
+  furnitureModel,
+  FurnitureType,
+  productModel,
+  ProductType
+} from '~/models/product.model'
 import {
   findAllDraftsForShop,
   findAllProducts,
@@ -8,14 +17,17 @@ import {
   findProduct,
   publishProductByShop,
   searchProductByUser,
-  unpublishProductByShop
+  unpublishProductByShop,
+  updateProductById
 } from '~/models/repositories/product.repo'
-import { ClothingType, ElectronicType, FurnitureType, ProductType } from '~/types/product'
 import { FindAllProductsInput, ProductActionPayload, ProductPaginationPayload } from '~/types/productRepo'
+import { cleanAndFlattenObject } from '~/utils'
 
 // Stratogy class
 type classRefType = new (payload: ProductType) => Product
 class ProductFactoryStrategy {
+  // dùng cách này thì sẽ không quan tâm constructor của con nhưng nếu con giống constructor thì dùng classRefTyle để kiểm soát chặt chẽ
+  // static productRegistry: Record<string, typeof Product> = {}
   static productRegistry: Record<string, classRefType> = {}
 
   static registerProductType(type: string, classRef: classRefType) {
@@ -35,6 +47,14 @@ class ProductFactoryStrategy {
       throw new BadRequestError(`Invalid product types ${type}`)
     }
     return new productClass(payload).createProduct()
+  }
+
+  static async updateProduct(type: string, product_id: string, payload: ProductType) {
+    const productClass = ProductFactoryStrategy.productRegistry[type]
+    if (!productClass) {
+      throw new BadRequestError(`Invalid product types ${type}`)
+    }
+    return new productClass(payload).updateProduct(product_id)
   }
 
   static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }: ProductPaginationPayload) {
@@ -78,36 +98,40 @@ class ProductFactoryStrategy {
 class Product {
   product_name: string
   product_thumb: string
-  product_description?: string
+  product_description?: string | null
   product_price: number
-  product_quantity: number
   product_type: string
-  product_shop: Types.ObjectId
+  product_shop?: Types.ObjectId | null
   product_attributes: ClothingType | ElectronicType | FurnitureType
+  product_quantity: number
   constructor({
     product_name,
     product_thumb,
     product_description,
     product_price,
-    product_quantity,
     product_type,
     product_shop,
-    product_attributes
+    product_attributes,
+    product_quantity
   }: ProductType) {
     this.product_name = product_name
     this.product_thumb = product_thumb
     this.product_description = product_description
     this.product_price = product_price
-    this.product_quantity = product_quantity
     this.product_type = product_type
     this.product_shop = product_shop
     this.product_attributes = product_attributes
+    this.product_quantity = product_quantity
   }
-  async createProduct(product_id?: Types.ObjectId): Promise<ProductType> {
+  async createProduct(product_id?: Types.ObjectId) {
     return await productModel.create({
       ...this,
       _id: product_id
     })
+  }
+
+  async updateProduct(product_id: string, payload?: ProductType) {
+    return await updateProductById({ product_id, payload: payload || this, model: productModel })
   }
 }
 
@@ -130,6 +154,21 @@ class Clothing extends Product {
 
     return newProduct
   }
+
+  async updateProduct(product_id: string) {
+    // console.log('[1]: ', this)
+    const payload = cleanAndFlattenObject(this)
+    // console.log('[2]: ', payload)
+    if (payload.product_attributes) {
+      await updateProductById({
+        product_id,
+        payload: payload.product_attributes,
+        model: clothingModel
+      })
+    }
+    const updateProduct = await super.updateProduct(product_id, payload)
+    return updateProduct
+  }
 }
 
 class Electronic extends Product {
@@ -150,6 +189,19 @@ class Electronic extends Product {
 
     return newProduct
   }
+
+  async updateProduct(product_id: string) {
+    const payload = cleanAndFlattenObject(this)
+    if (payload.product_attributes) {
+      await updateProductById({
+        product_id,
+        payload: payload.product_attributes,
+        model: electronicModel
+      })
+    }
+    const updateProduct = await super.updateProduct(product_id, payload)
+    return updateProduct
+  }
 }
 
 class Furniture extends Product {
@@ -169,6 +221,19 @@ class Furniture extends Product {
     }
 
     return newProduct
+  }
+
+  async updateProduct(product_id: string) {
+    const payload = cleanAndFlattenObject(this)
+    if (payload.product_attributes) {
+      await updateProductById({
+        product_id,
+        payload: payload.product_attributes,
+        model: furnitureModel
+      })
+    }
+    const updateProduct = await super.updateProduct(product_id, payload)
+    return updateProduct
   }
 }
 

@@ -1,8 +1,7 @@
 import { SortOrder, Types } from 'mongoose'
-import { productModel } from '../product.model'
-import { ProductType } from '~/types/product'
-import { FindAllProductsInput, PaginationOptions, ProductActionPayload } from '~/types/productRepo'
+import { FindAllProductsInput, PaginationOptions, ProductActionPayload, UpdateProductInput } from '~/types/productRepo'
 import { getSelectData, unGetSelectData } from '~/utils'
+import { productModel, ProductType } from '../product.model'
 
 const findAllDraftsForShop = async ({ query, limit, skip }: PaginationOptions) => {
   return await queryProduct({ query, limit, skip })
@@ -86,12 +85,17 @@ const findProduct = async ({ product_id, unselect }: { product_id: string; unsel
   return await productModel.findById(product_id).select(unGetSelectData(unselect))
 }
 
+const updateProductById = async ({ product_id, payload, model, isNew = true }: UpdateProductInput) => {
+  return await model.findByIdAndUpdate(product_id, payload, { new: isNew })
+}
+
 export {
   findAllDraftsForShop,
-  findAllPublishsForShop,
-  publishProductByShop,
-  unpublishProductByShop,
-  searchProductByUser,
   findAllProducts,
-  findProduct
+  findAllPublishsForShop,
+  findProduct,
+  publishProductByShop,
+  searchProductByUser,
+  unpublishProductByShop,
+  updateProductById
 }

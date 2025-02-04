@@ -1,5 +1,4 @@
-import mongoose, { model, Schema } from 'mongoose'
-import { ClothingType, ElectronicType, FurnitureType, ProductType } from '~/types/product'
+import mongoose, { InferSchemaType, model, Schema, Types } from 'mongoose'
 import slugify from 'slugify'
 
 const DOCUMENT_NAME_PRODUCT = 'Product'
@@ -14,7 +13,7 @@ const COLLECTION_NAME_ELECTRONIC = 'Electronics'
 const DOCUMENT_NAME_FURNITURE = 'Furniture'
 const COLLECTION_NAME_FURNITURE = 'Furnitures'
 
-const productSchema = new Schema<ProductType>(
+const productSchema = new Schema(
   {
     product_name: {
       type: String,
@@ -86,7 +85,7 @@ productSchema.pre('save', function (next) {
 // Create index for full text search
 productSchema.index({ product_name: 'text', product_description: 'text' })
 
-const clothingSchema = new Schema<ClothingType>(
+const clothingSchema = new Schema(
   {
     brand: {
       type: String,
@@ -105,7 +104,7 @@ const clothingSchema = new Schema<ClothingType>(
   }
 )
 
-const electronicSchema = new Schema<ElectronicType>(
+const electronicSchema = new Schema(
   {
     manufacturer: {
       type: String,
@@ -124,7 +123,7 @@ const electronicSchema = new Schema<ElectronicType>(
   }
 )
 
-const furnitureSchema = new Schema<FurnitureType>(
+const furnitureSchema = new Schema(
   {
     brand: {
       type: String,
@@ -143,9 +142,19 @@ const furnitureSchema = new Schema<FurnitureType>(
   }
 )
 
+type ProductSchemaType = InferSchemaType<typeof productSchema>
+type ClothingSchemaType = InferSchemaType<typeof clothingSchema>
+type ElectronicSchemaType = InferSchemaType<typeof electronicSchema>
+type FurnitureSchemaType = InferSchemaType<typeof furnitureSchema>
+
+export type ProductType = ProductSchemaType & { _id: Types.ObjectId }
+export type ClothingType = ClothingSchemaType & { _id: Types.ObjectId }
+export type ElectronicType = ElectronicSchemaType & { _id: Types.ObjectId }
+export type FurnitureType = FurnitureSchemaType & { _id: Types.ObjectId }
+
 const productModel = mongoose.models[DOCUMENT_NAME_PRODUCT] || model(DOCUMENT_NAME_PRODUCT, productSchema)
 const clothingModel = mongoose.models[DOCUMENT_NAME_CLOTHING] || model(DOCUMENT_NAME_CLOTHING, clothingSchema)
 const electronicModel = mongoose.models[DOCUMENT_NAME_ELECTRONIC] || model(DOCUMENT_NAME_ELECTRONIC, electronicSchema)
 const furnitureModel = mongoose.models[DOCUMENT_NAME_FURNITURE] || model(DOCUMENT_NAME_FURNITURE, furnitureSchema)
 
-export { productModel, clothingModel, electronicModel, furnitureModel }
+export { clothingModel, electronicModel, furnitureModel, productModel }
