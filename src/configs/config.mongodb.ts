@@ -8,8 +8,8 @@ type DBConfig = {
   dbname: string
 }
 
-interface AppConfig {
-  port: string
+type AppConfig = {
+  port: string | number
 }
 
 type Config = {
@@ -19,7 +19,7 @@ type Config = {
 
 export const dev: Config = {
   app: {
-    port: process.env.PORT || '3055'
+    port: process.env.PORT || 3055
   },
   db: {
     user: process.env.DEV_DB_USER || '',

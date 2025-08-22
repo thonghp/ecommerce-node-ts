@@ -15,7 +15,7 @@ declare global {
   }
   namespace NodeJS {
     interface ProcessEnv {
-      PORT: string
+      PORT: string | number
       DEV_DB_PORT: string
       DEV_DB_USER: string
       DEV_DB_PW: string
@@ -27,3 +27,5 @@ declare global {
     status: number
   }
 }
+// đảm bảo đây là một module để ts đọc
+export {}

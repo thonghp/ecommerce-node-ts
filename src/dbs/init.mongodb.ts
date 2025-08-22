@@ -3,7 +3,8 @@ import { countConnect } from '../helpers/check.connect'
 import { dev } from '~/configs/config.mongodb'
 
 const { user, pw, dbname } = dev['db']
-const connectString = `mongodb+srv://${user}:${pw}@cluster0demo.vn9ld.mongodb.net/${dbname}`
+// const connectString = `mongodb+srv://${user}:${pw}@cluster0demo.vn9ld.mongodb.net/${dbname}`
+const connectString = `mongodb://localhost:27017/${dbname}`
 class Database {
   // Là null thì sẽ gán giá trị ban đầu, nếu ta không sử dụng thì trường hợp null nó sẽ hiểu là undefined
   private static instance: Database | null = null
@@ -18,13 +19,6 @@ class Database {
       mongoose.set('debug', { color: true })
     }
 
-    // default maxPoolSize = 100
-    /*
-     * nhóm kết nối là tập hợp các kết nối của database mà có thể tái sử dụng được duy trì bởi database
-     * khi ứng dụng yêu cầu kết nối nó sẽ kiểm tra nhóm kết nối trong poolsize, nếu có thì nó sẽ sử
-     * dụng cho kết nối mới còn không có kết nối nào thì nó sẽ tạo kết nối mới và thêm vào trong nhóm
-     * cơ chế này giống connection pool
-     */
     mongoose
       .connect(connectString, { maxPoolSize: 50 })
       .then((_) => {
