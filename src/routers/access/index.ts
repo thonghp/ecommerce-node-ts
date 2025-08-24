@@ -5,6 +5,7 @@ import asyncHandler from '~/helpers/asyncHandler'
 
 const router = Router()
 
+router.get('/generate_api_key', accessController.apiKey)
 router.post('/shop/signup', asyncHandler(accessController.signUp))
 router.post('/shop/login', asyncHandler(accessController.login))
 

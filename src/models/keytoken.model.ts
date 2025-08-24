@@ -1,11 +1,12 @@
-import mongoose, { model, Schema } from 'mongoose'
+import mongoose, { InferSchemaType, model, Schema, Types } from 'mongoose'
 import { KeyInfo } from '~/types/keytoken'
 
 const DOCUMENT_NAME = 'Key' // name of the model used when calling model
 const COLLECTION_NAME = 'Keys' // name of the collection in mongodb
 
 // Declare the Schema of the Mongo model
-const keyTokenSchema = new Schema<KeyInfo>(
+// const keyTokenSchema = new Schema<KeyInfo>(
+const keyTokenSchema = new Schema(
   {
     user: {
       type: Schema.Types.ObjectId, // reference to the user's objectid in the shop model
@@ -34,6 +35,10 @@ const keyTokenSchema = new Schema<KeyInfo>(
     collection: COLLECTION_NAME // specify collection name instead of mongoose generated
   }
 )
+
+export type KeyTokenType = InferSchemaType<typeof keyTokenSchema> & {
+  _id: Types.ObjectId
+}
 
 // Kiểm tra và tránh ghi đè model khi hot reload
 const keyTokenModel = mongoose.models[DOCUMENT_NAME] || model(DOCUMENT_NAME, keyTokenSchema)

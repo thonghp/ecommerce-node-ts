@@ -16,7 +16,7 @@ const HEADER = {
 /**
  * Get payload plus private key and public key to sign jwt to create access and refresh token pair
  */
-const createTokenPair = async ({ payload, privateKey, publicKey }: TokenGenerationParams): Promise<TokenPair> => {
+const createTokenPair = async ({ payload, privateKey, publicKey }: TokenGenerationParams) => {
   try {
     const accessToken = await JWT.sign(payload, publicKey, {
       expiresIn: '2 days'

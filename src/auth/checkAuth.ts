@@ -12,6 +12,12 @@ const HEADER = {
 const apiKey = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const key = req.headers[HEADER.API_KEY]?.toString()
+    const isGenerateApiKeyRoute = req.url.includes('generate_api_key')
+
+    if (isGenerateApiKeyRoute) {
+      return next()
+    }
+
     if (!key) {
       return res.status(403).json({
         message: 'Forbidden Error'
@@ -19,6 +25,7 @@ const apiKey = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     const objKey = await findById(key)
+
     if (!objKey) {
       return res.status(403).json({
         message: 'Forbidden Error'
@@ -37,6 +44,12 @@ const apiKey = async (req: Request, res: Response, next: NextFunction) => {
  */
 const permission = (permission: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
+    const isGenerateApiKeyRoute = req.url.includes('generate_api_key')
+
+    if (isGenerateApiKeyRoute) {
+      return next()
+    }
+
     if (!req.objKey.permissions) {
       return res.status(403).json({
         message: 'Permission denied'

@@ -9,6 +9,7 @@ import { JwtUserPayload } from '~/types/jwtUserPayload'
 import { User } from '~/types/shop'
 import KeyTokenService from './keytoken.service'
 import findByEmail from './shop.service'
+import { createXApiKey } from './apikey.service'
 
 const RoleShop = {
   SHOP: 'SHOP', // ngoài thực tế người ta dùng là các con số như 0001 để đại diện cho role này
@@ -151,6 +152,10 @@ class AccessService {
       code: 200,
       metadata: null
     }
+  }
+
+  static generateApiKey = async () => {
+    return await createXApiKey()
   }
 }
 
