@@ -1,13 +1,8 @@
-import shopModel from '~/models/shop.model'
-import { Shop } from '~/types/shop'
+import shopModel, { ShopType } from '~/models/shop.model'
 
-type FindUser = {
-  id: number
-  email: number
-  password: number
-  name: number
-  status: number
-  roles: number
+type FindByEmailParams = {
+  email: string
+  select?: Record<string, number>
 }
 
 const findByEmail = async ({
@@ -20,11 +15,8 @@ const findByEmail = async ({
     status: 1,
     roles: 1
   }
-}: {
-  email: string
-  select?: FindUser
-}): Promise<Shop | null> => {
-  return await shopModel.findOne({ email }).select(select).lean<Shop>().exec()
+}: FindByEmailParams) => {
+  return await shopModel.findOne({ email }).select(select).lean<ShopType>().exec()
 }
 
 export default findByEmail

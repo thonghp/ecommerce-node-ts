@@ -3,8 +3,8 @@ import JWT from 'jsonwebtoken'
 import { AuthFailureError, NotFoundError } from '~/core/error.response'
 import asyncHandler from '~/helpers/asyncHandler'
 import KeyTokenService from '~/services/keytoken.service'
-import { TokenGenerationParams, TokenPair } from '~/types/token'
 import { JwtUserPayload } from '~/types/jwtUserPayload'
+import { TokenGenerationParams } from '~/types/token'
 
 const HEADER = {
   API_KEY: 'x-api-key',

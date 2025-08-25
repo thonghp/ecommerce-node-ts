@@ -4,18 +4,23 @@ import crypto from 'node:crypto'
 import { createTokenPair } from '~/auth/authUtils'
 import { AuthFailureError, BadRequestError, ForbiddenError } from '~/core/error.response'
 import shopModel from '~/models/shop.model'
-import { KeyInfo } from '~/types/keytoken'
 import { JwtUserPayload } from '~/types/jwtUserPayload'
-import { User } from '~/types/shop'
+import { KeyInfo } from '~/types/keytoken'
+import { createXApiKey } from './apikey.service'
 import KeyTokenService from './keytoken.service'
 import findByEmail from './shop.service'
-import { createXApiKey } from './apikey.service'
 
 const RoleShop = {
   SHOP: 'SHOP', // ngoài thực tế người ta dùng là các con số như 0001 để đại diện cho role này
   EDITOR: 'EDITOR',
   WRITTER: 'WRITTER',
   ADMIN: 'ADMIN'
+}
+
+type User = {
+  name: string
+  email: string
+  password: string
 }
 
 class AccessService {

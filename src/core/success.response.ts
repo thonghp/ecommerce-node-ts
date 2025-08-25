@@ -1,7 +1,13 @@
 import { Response } from 'express'
-import { ResponseParams } from '~/types/successResponse'
 import reasonPhrases from '~/utils/reasonPhrases'
 import statusCode from '~/utils/statusCode'
+
+type ResponseParams = {
+  message: string
+  metadata: unknown
+  status?: number
+  reasonStatus?: string
+}
 
 class SuccessResponse {
   message: string

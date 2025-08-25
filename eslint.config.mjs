@@ -5,8 +5,9 @@ import eslintPluginPrettier from 'eslint-plugin-prettier'
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
+  { ignores: ['**/node_modules/', '**/dist/'] },
   { files: ['**/*.{js,mjs,cjs,ts}'] },
-  { languageOptions: { globals: globals.browser } },
+  { languageOptions: { parser: tseslint.parser, globals: globals.browser } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   {
@@ -30,7 +31,6 @@ export default [
           jsxSingleQuote: true
         }
       ]
-    },
-    ignores: ['**/node_modules/', '**/dist/']
+    }
   }
 ]

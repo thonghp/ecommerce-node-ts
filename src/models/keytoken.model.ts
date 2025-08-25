@@ -1,5 +1,4 @@
 import mongoose, { InferSchemaType, model, Schema, Types } from 'mongoose'
-import { KeyInfo } from '~/types/keytoken'
 
 const DOCUMENT_NAME = 'Key' // name of the model used when calling model
 const COLLECTION_NAME = 'Keys' // name of the collection in mongodb
