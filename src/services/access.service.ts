@@ -3,9 +3,9 @@ import _ from 'lodash'
 import crypto from 'node:crypto'
 import { createTokenPair } from '~/auth/authUtils'
 import { AuthFailureError, BadRequestError, ForbiddenError } from '~/core/error.response'
+import { KeyTokenType } from '~/models/keytoken.model'
 import shopModel from '~/models/shop.model'
 import { JwtUserPayload } from '~/types/jwtUserPayload'
-import { KeyInfo } from '~/types/keytoken'
 import { createXApiKey } from './apikey.service'
 import KeyTokenService from './keytoken.service'
 import findByEmail from './shop.service'
@@ -23,35 +23,36 @@ type User = {
   password: string
 }
 
+type HandleRefreshTokenParams = {
+  keyStore: KeyTokenType
+  user: JwtUserPayload
+  refreshToken: string
+}
+
 class AccessService {
-  static handleRefreshToken = async ({
-    keyStore,
-    user,
-    refreshToken
-  }: {
-    keyStore: KeyInfo
-    user: JwtUserPayload
-    refreshToken: string
-  }) => {
+  static handleRefreshToken = async ({ keyStore, user, refreshToken }: HandleRefreshTokenParams) => {
     const { userId, email } = user
+    // nếu refreshToken đã dùng => nghi ngờ bị hack => xóa keyStore
     if (keyStore.refreshTokenUsed.includes(refreshToken)) {
       await KeyTokenService.deleteByUserId(userId)
       throw new ForbiddenError('Something wrong happened !! Pls re-login')
     }
 
+    // refreshToken hiện tại không khớp => invalid
     if (keyStore.refreshToken !== refreshToken) {
       throw new AuthFailureError('Invalid token')
     }
+
     const isExistingUser = await findByEmail({ email })
     if (!isExistingUser) {
       throw new AuthFailureError('Shop not registered')
     }
+
     const tokens = await createTokenPair({
       payload: { userId, email },
       privateKey: keyStore.privateKey,
       publicKey: keyStore.publicKey
     })
-
     await KeyTokenService.updateRefreshToken(keyStore._id, tokens.refreshToken, refreshToken)
 
     return {
@@ -60,7 +61,7 @@ class AccessService {
     }
   }
 
-  static logout = async (keyStore: KeyInfo) => {
+  static logout = async (keyStore: KeyTokenType) => {
     const delKey = await KeyTokenService.removeKeyById(keyStore._id)
 
     return delKey
@@ -88,7 +89,6 @@ class AccessService {
     const { _id: userId } = isExistingUser
     const privateKey = crypto.randomBytes(64).toString('hex')
     const publicKey = crypto.randomBytes(64).toString('hex')
-
     const tokens = await createTokenPair({
       payload: { userId, email },
       privateKey,
@@ -125,7 +125,6 @@ class AccessService {
     if (newUser) {
       const privateKey = crypto.randomBytes(64).toString('hex')
       const publicKey = crypto.randomBytes(64).toString('hex')
-
       const keyStored = await KeyTokenService.createKeyToken({
         user: newUser._id,
         publicKey,
@@ -138,6 +137,7 @@ class AccessService {
           message: 'keystore error'
         }
       }
+
       const tokens = await createTokenPair({
         payload: { userId: newUser._id, email },
         publicKey,

@@ -1,6 +1,12 @@
 import { Types } from 'mongoose'
 import keytokenModel, { KeyTokenType } from '~/models/keytoken.model'
-import { CreateKey, KeyInfo } from '~/types/keytoken'
+
+type CreateKey = {
+  user: Types.ObjectId
+  privateKey: string
+  publicKey: string
+  refreshToken?: string
+}
 
 class KeyTokenService {
   /**
@@ -16,6 +22,7 @@ class KeyTokenService {
        * new true => trả về document sau khi update or create, mặc định là trả về document trước update
        */
       const tokens = await keytokenModel.findOneAndUpdate(filter, update, options).lean<KeyTokenType>().exec()
+
       return tokens ? tokens.publicKey : null
     } catch (error) {
       console.error(`Error: ${error}`)
@@ -26,7 +33,7 @@ class KeyTokenService {
   static findByUserId = async (userId: string) => {
     return await keytokenModel
       .findOne({ user: Types.ObjectId.createFromHexString(userId) })
-      .lean<KeyInfo>()
+      .lean<KeyTokenType>()
       .exec()
   }
 
@@ -36,12 +43,8 @@ class KeyTokenService {
     return delKey
   }
 
-  static findByRefreshToken = async (refreshToken: string): Promise<KeyInfo | null> => {
-    return await keytokenModel.findOne({ refreshToken })
-  }
-
-  static findRefeshTokenUsed = async (refreshToken: string): Promise<KeyInfo | null> => {
-    return await keytokenModel.findOne({ refreshTokenUsed: refreshToken }).lean<KeyInfo>()
+  static findByRefeshTokenUsed = async (refreshToken: string) => {
+    return await keytokenModel.findOne({ refreshTokenUsed: refreshToken }).lean<KeyTokenType>().exec()
   }
 
   static deleteByUserId = async (userId: Types.ObjectId) => {

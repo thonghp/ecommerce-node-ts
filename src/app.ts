@@ -29,12 +29,13 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   // tạo error 404 xử lý không có route nào khớp
   const error = new Error('Not found')
   error.status = 404
-  next(error) // chuyển sang middleware xử lý error
+  next(error) // chuyển sang middleware ở dưới
 })
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
-  // xử lý đọc error (bao gồm error ở trên)
+  // xử lý tất cả error
   const statusCode = error.status || 500
+
   return res.status(statusCode).json({
     status: 'error',
     code: statusCode,

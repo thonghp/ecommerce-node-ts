@@ -17,6 +17,7 @@ export default [
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-unused-vars': 'warn', // warn off
+      curly: ['error', 'all'], // bắt buộc phải có {} sau if, else, while, for, ...
       'prettier/prettier': [
         'warn',
         {
@@ -30,6 +31,14 @@ export default [
           printWidth: 120,
           jsxSingleQuote: true
         }
+      ],
+      // Rule xuống dòng sau if
+      'padding-line-between-statements': [
+        'error',
+        // sau if/else, for, while,...
+        { blankLine: 'always', prev: 'block-like', next: '*' },
+        { blankLine: 'always', prev: '*', next: 'return' }
+        // { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' }
       ]
     }
   }
