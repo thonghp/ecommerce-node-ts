@@ -39,6 +39,11 @@ export default [
         { blankLine: 'always', prev: 'block-like', next: '*' },
         { blankLine: 'always', prev: '*', next: 'return' }
         // { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' }
+      ],
+      'lines-between-class-members': [
+        'error',
+        'always',
+        { exceptAfterSingleLine: true } // sau các method xuống dòng
       ]
     }
   }

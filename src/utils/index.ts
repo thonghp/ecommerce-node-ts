@@ -1,59 +1,86 @@
 // ['a', 'b', 'c'] => { a: 1, b: 1, c: 1 }
-const getSelectData = (select: string[] = []) => {
+const getSelectData = (select: string[]) => {
   return Object.fromEntries(select.map((item) => [item, 1]))
 }
 
-const unGetSelectData = (select: string[] = []) => {
+const unGetSelectData = (select: string[]) => {
   return Object.fromEntries(select.map((item) => [item, 0]))
 }
 
-const removeNullAndUndefinedObject = (obj: any) => {
+// lấy ra các instance của object đó
+const getInstanceChain = (obj: unknown) => {
+  const chain: string[] = []
+  let proto = Object.getPrototypeOf(obj)
+  while (proto) {
+    // Lấy constructor nếu có
+    if (proto.constructor && proto.constructor.name) {
+      chain.push(proto.constructor.name)
+    }
+
+    proto = Object.getPrototypeOf(proto)
+  }
+
+  return chain
+}
+
+// cách này thì side effect vì nó thay đổi object gốc, cách ở dưới thì clone ra hợp lý hơn
+const removeNullAndUndefinedObject = <T extends object>(obj: T): Partial<T> => {
   Object.keys(obj).forEach((key) => {
-    if (obj[key] == null) {
-      delete obj[key]
+    const value = obj[key as keyof T]
+    if (value == null) {
+      delete obj[key as keyof T]
     }
   })
+
   return obj
 }
 
-const updateNestedObjectParser = (obj: any) => {
-  // console.log('[1]: ', obj)
-  const final: any = {}
+// Loại bỏ null và undefined, trong lập trình người ta thường gọi là nil (dùng nhiều trong lodash)
+const omitNil = <T extends object>(obj: T): Partial<T> => {
+  const cleaned: Partial<T> = {}
   Object.keys(obj).forEach((key) => {
-    if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-      const response = updateNestedObjectParser(obj[key])
-      Object.keys(response).forEach((k) => {
-        final[`${key}.${k}`] = response[k]
-      })
-    } else {
-      final[key] = obj[key]
+    const value = obj[key as keyof T]
+    if (value != null) {
+      cleaned[key as keyof T] = value
     }
   })
+
+  return cleaned
+}
+
+const convertObjectToFlatten = <T extends object>(obj: T): Record<string, unknown> => {
+  // console.log('[1]: ', obj)
+  const flattened: Record<string, unknown> = {}
+  Object.keys(obj).forEach((key) => {
+    const value = obj[key as keyof T]
+    if (typeof value === 'object' && !Array.isArray(value)) {
+      const childFlat = convertObjectToFlatten(value as object)
+      Object.keys(childFlat).forEach((nestedKey) => {
+        flattened[`${key}.${nestedKey}`] = childFlat[nestedKey]
+      })
+    } else {
+      flattened[key] = value
+    }
+  })
+
   // console.log('[2]: ', final)
-  return final
+  return flattened
 }
 
 // ignore null and undefined field in object and convert nested object to flat
-const cleanAndFlattenObject = (obj: any) => {
-  const final: any = {}
+const sanitizeAndFlatten = <T extends object>(obj: T): Record<string, unknown> => {
+  const cleaned = omitNil(obj)
+  const flatObj = convertObjectToFlatten(cleaned)
 
-  Object.keys(obj).forEach((key) => {
-    const value = obj[key]
-
-    // Bỏ qua các giá trị null hoặc undefined
-    if (value == null) return
-
-    if (typeof value === 'object' && !Array.isArray(value)) {
-      const response = cleanAndFlattenObject(value)
-      Object.keys(response).forEach((k) => {
-        final[`${key}.${k}`] = response[k]
-      })
-    } else {
-      final[key] = value
-    }
-  })
-
-  return final
+  return flatObj
 }
 
-export { cleanAndFlattenObject, getSelectData, removeNullAndUndefinedObject, unGetSelectData, updateNestedObjectParser }
+export {
+  removeNullAndUndefinedObject,
+  convertObjectToFlatten,
+  getSelectData,
+  omitNil,
+  sanitizeAndFlatten,
+  unGetSelectData,
+  getInstanceChain
+}

@@ -25,6 +25,7 @@ class SuccessResponse {
     if (Object.keys(headers).length > 0) {
       res.set(headers)
     }
+
     return res.status(this.status).json(this)
   }
 }

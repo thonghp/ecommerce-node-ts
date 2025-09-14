@@ -21,19 +21,24 @@ import {
   unpublishProductByShop,
   updateProductById
 } from '~/models/repositories/product.repo'
-import { FindAllProductsInput, ProductActionPayload, ProductPaginationPayload } from '~/types/productRepo'
-import { cleanAndFlattenObject } from '~/utils'
+import { DraftsOrPublishParams, FindAllProductParams, ProductShopParams } from '~/types/productRepo'
+import { sanitizeAndFlatten } from '~/utils'
 
-// Stratogy class
+// type constructor, type này bắt buộc khi new constructor phải giống như vậy, kể cả lớp con kế thừa
 type classRefType = new (payload: ProductType) => Product
-class ProductFactoryStrategy {
-  // dùng cách này thì sẽ không quan tâm constructor của con nhưng nếu con giống constructor thì dùng classRefTyle để kiểm soát chặt chẽ
+// ================= STRATEGY ===================
+class ProductStrategy {
+  // Cách này nhanh gọn không quan tâm lớp con new constructor thế nào
   // static productRegistry: Record<string, typeof Product> = {}
+
+  // registry này là 1 object có key là tên còn value là 1 class
   static productRegistry: Record<string, classRefType> = {}
 
+  // Hàm này dùng để thêm vào trong registry
   static registerProductType(type: string, classRef: classRefType) {
-    ProductFactoryStrategy.productRegistry[type] = classRef
+    ProductStrategy.productRegistry[type] = classRef
   }
+
   static async createProduct(type: string, payload: ProductType) {
     // switch (type) {
     //   case 'Clothing':
@@ -43,36 +48,40 @@ class ProductFactoryStrategy {
     //   default:
     //     throw new BadRequestError(`Invalid product types ${type}`)
     // }
-    const productClass = ProductFactoryStrategy.productRegistry[type]
+    const productClass = ProductStrategy.productRegistry[type]
     if (!productClass) {
       throw new BadRequestError(`Invalid product types ${type}`)
     }
+
     return new productClass(payload).createProduct()
   }
 
   static async updateProduct(type: string, product_id: string, payload: ProductType) {
-    const productClass = ProductFactoryStrategy.productRegistry[type]
+    const productClass = ProductStrategy.productRegistry[type]
     if (!productClass) {
       throw new BadRequestError(`Invalid product types ${type}`)
     }
+
     return new productClass(payload).updateProduct(product_id)
   }
 
-  static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }: ProductPaginationPayload) {
+  static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }: DraftsOrPublishParams) {
     const query = { product_shop, isDraft: true }
+
     return await findAllDraftsForShop({ query, limit, skip })
   }
 
-  static async findAllPublishsForShop({ product_shop, limit = 50, skip = 0 }: ProductPaginationPayload) {
+  static async findAllPublishsForShop({ product_shop, limit = 50, skip = 0 }: DraftsOrPublishParams) {
     const query = { product_shop, isPublished: true }
+
     return await findAllPublishsForShop({ query, limit, skip })
   }
 
-  static async publishProductByShop({ product_id, product_shop }: ProductActionPayload) {
+  static async publishProductByShop({ product_id, product_shop }: ProductShopParams) {
     return await publishProductByShop({ product_id, product_shop })
   }
 
-  static async unpublishProductByShop({ product_id, product_shop }: ProductActionPayload) {
+  static async unpublishProductByShop({ product_id, product_shop }: ProductShopParams) {
     return await unpublishProductByShop({ product_id, product_shop })
   }
 
@@ -85,17 +94,17 @@ class ProductFactoryStrategy {
     sort = 'ctime',
     page = 1,
     filter = { isPubished: true },
-    select = []
-  }: FindAllProductsInput) {
+    select = ['product_name', 'product_price', 'product_thumb']
+  }: FindAllProductParams) {
     return await findAllProducts({ limit, sort, page, filter, select })
   }
 
-  static async findProduct({ product_id }: { product_id: string }) {
+  static async findProduct(product_id: string) {
     return await findProduct({ product_id, unselect: ['__v'] })
   }
 }
 
-// base class
+// ================= BASE CLASS ===================
 class Product {
   product_name: string
   product_thumb: string
@@ -124,6 +133,7 @@ class Product {
     this.product_attributes = product_attributes
     this.product_quantity = product_quantity
   }
+
   async createProduct(product_id?: Types.ObjectId) {
     const newProduct: ProductType = await productModel.create({ ...this, _id: product_id })
     if (newProduct) {
@@ -134,18 +144,19 @@ class Product {
         stock: this.product_quantity
       })
     }
+
     return newProduct
   }
 
-  async updateProduct(product_id: string, payload?: ProductType) {
-    return await updateProductById({ product_id, payload: payload || this, model: productModel })
+  async updateProduct(product_id: string, payload?: Record<string, unknown>) {
+    return await updateProductById({ product_id, payload, model: productModel })
   }
 }
 
 // define sub-class
 class Clothing extends Product {
   async createProduct() {
-    const newClothing = await clothingModel.create({
+    const newClothing: ClothingType = await clothingModel.create({
       ...this.product_attributes,
       product_shop: this.product_shop
     })
@@ -163,24 +174,16 @@ class Clothing extends Product {
   }
 
   async updateProduct(product_id: string) {
-    // console.log('[1]: ', this)
-    const payload = cleanAndFlattenObject(this)
-    // console.log('[2]: ', payload)
-    if (payload.product_attributes) {
-      await updateProductById({
-        product_id,
-        payload: payload.product_attributes,
-        model: clothingModel
-      })
-    }
+    const payload = sanitizeAndFlatten(this)
     const updateProduct = await super.updateProduct(product_id, payload)
+
     return updateProduct
   }
 }
 
 class Electronic extends Product {
   async createProduct() {
-    const newElectronic = await electronicModel.create({
+    const newElectronic: ElectronicType = await electronicModel.create({
       ...this.product_attributes,
       product_shop: this.product_shop
     })
@@ -198,22 +201,16 @@ class Electronic extends Product {
   }
 
   async updateProduct(product_id: string) {
-    const payload = cleanAndFlattenObject(this)
-    if (payload.product_attributes) {
-      await updateProductById({
-        product_id,
-        payload: payload.product_attributes,
-        model: electronicModel
-      })
-    }
+    const payload = sanitizeAndFlatten(this)
     const updateProduct = await super.updateProduct(product_id, payload)
+
     return updateProduct
   }
 }
 
 class Furniture extends Product {
   async createProduct() {
-    const newFurniture = await furnitureModel.create({
+    const newFurniture: FurnitureType = await furnitureModel.create({
       ...this.product_attributes,
       product_shop: this.product_shop
     })
@@ -231,21 +228,16 @@ class Furniture extends Product {
   }
 
   async updateProduct(product_id: string) {
-    const payload = cleanAndFlattenObject(this)
-    if (payload.product_attributes) {
-      await updateProductById({
-        product_id,
-        payload: payload.product_attributes,
-        model: furnitureModel
-      })
-    }
+    const payload = sanitizeAndFlatten(this)
     const updateProduct = await super.updateProduct(product_id, payload)
+
     return updateProduct
   }
 }
 
-ProductFactoryStrategy.registerProductType('Clothing', Clothing)
-ProductFactoryStrategy.registerProductType('Electronic', Electronic)
-ProductFactoryStrategy.registerProductType('Furniture', Furniture)
+// Đăng ký các class vô registry
+ProductStrategy.registerProductType('Clothing', Clothing)
+ProductStrategy.registerProductType('Electronic', Electronic)
+ProductStrategy.registerProductType('Furniture', Furniture)
 
-export default ProductFactoryStrategy
+export default ProductStrategy

@@ -9,8 +9,6 @@ declare global {
       refreshToken: string
       user: JwtUserPayload
       objKey: ApiKeyType
-      body: unknown
-      params: string
     }
   }
   namespace NodeJS {

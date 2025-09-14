@@ -4,13 +4,18 @@ import { AuthFailureError, NotFoundError } from '~/core/error.response'
 import asyncHandler from '~/helpers/asyncHandler'
 import KeyTokenService from '~/services/keytoken.service'
 import { JwtUserPayload } from '~/types/jwtUserPayload'
-import { TokenGenerationParams } from '~/types/token'
 
 const HEADER = {
   API_KEY: 'x-api-key',
   CLIENT_ID: 'x-client-id',
   AUTHORIZATION: 'authorization',
   REFRESHTOKEN: 'x-token-id'
+}
+
+type TokenGenerationParams = {
+  payload: JwtUserPayload
+  privateKey: string
+  publicKey: string
 }
 
 /**

@@ -11,6 +11,7 @@ class Database {
   private constructor() {
     this.connect()
   }
+
   // type = 'mongodb' sau này muốn xài db khác thì thay type
   connect(type: string = 'mongodb'): void {
     const isMongodb = type === 'mongodb'
@@ -26,6 +27,7 @@ class Database {
       })
       .catch((err) => console.log(`Error connect to database: ${err}`))
   }
+
   static getInstance(): Database {
     if (!Database.instance) {
       Database.instance = new Database()

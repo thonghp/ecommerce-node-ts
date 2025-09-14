@@ -13,24 +13,28 @@ class AccessController {
       })
     }).send(res)
   }
+
   logout = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: 'Logout successfully',
       metadata: await AccessService.logout(req.keyStore)
     }).send(res)
   }
+
   login = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: 'Login successfully',
       metadata: await AccessService.login(req.body)
     }).send(res)
   }
+
   signUp = async (req: Request, res: Response, next: NextFunction) => {
     new CREATED({
       message: 'Sign up successfully',
       metadata: await AccessService.signup(req.body)
     }).send(res)
   }
+
   apiKey = async (req: Request, res: Response, next: NextFunction) => {
     new CREATED({
       message: 'Get api key success!',

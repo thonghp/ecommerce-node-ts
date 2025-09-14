@@ -6,11 +6,12 @@ import { transformQueryProducts } from '~/utils/transformQuery'
 
 class ProductController {
   createProduct = async (req: Request, res: Response, next: NextFunction) => {
-    const productData = req.body as ProductType
+    // req.body mặc định có type là any nên ta có thể ép kiểu được ở đây
+    const payload = req.body as ProductType
     new CREATED({
       message: 'Create new product success!',
-      metadata: await ProductService.createProduct(productData.product_type, {
-        ...productData,
+      metadata: await ProductService.createProduct(payload.product_type, {
+        ...payload,
         product_shop: req.user.userId
       })
     }).send(res)
@@ -62,6 +63,7 @@ class ProductController {
   }
 
   findAllProducts = async (req: Request, res: Response, next: NextFunction) => {
+    // req.query có type mặc định là ParsedQs nên không thể cast như req.body
     const queryParam = transformQueryProducts(req.query)
     new SuccessResponse({
       message: 'get list products success!',
@@ -72,18 +74,16 @@ class ProductController {
   findProduct = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
       message: 'get product success!',
-      metadata: await ProductService.findProduct({
-        product_id: req.params.productId
-      })
+      metadata: await ProductService.findProduct(req.params.productId)
     }).send(res)
   }
 
   updateProduct = async (req: Request, res: Response, next: NextFunction) => {
-    const productData = req.body as ProductType
+    const payload = req.body as ProductType
     new SuccessResponse({
       message: 'update product success!',
-      metadata: await ProductService.updateProduct(productData.product_type, req.params.productId, {
-        ...productData,
+      metadata: await ProductService.updateProduct(payload.product_type, req.params.productId, {
+        ...payload,
         product_shop: req.user.userId
       })
     }).send(res)

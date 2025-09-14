@@ -54,7 +54,7 @@ const productSchema = new Schema(
       set: (val: number) => Math.round(val * 10) / 10
     },
     product_variations: {
-      type: [String],
+      type: Array,
       default: []
     },
     isDraft: {
@@ -142,15 +142,10 @@ const furnitureSchema = new Schema(
   }
 )
 
-type ProductSchemaType = InferSchemaType<typeof productSchema>
-type ClothingSchemaType = InferSchemaType<typeof clothingSchema>
-type ElectronicSchemaType = InferSchemaType<typeof electronicSchema>
-type FurnitureSchemaType = InferSchemaType<typeof furnitureSchema>
-
-export type ProductType = ProductSchemaType & { _id: Types.ObjectId }
-export type ClothingType = ClothingSchemaType & { _id: Types.ObjectId }
-export type ElectronicType = ElectronicSchemaType & { _id: Types.ObjectId }
-export type FurnitureType = FurnitureSchemaType & { _id: Types.ObjectId }
+export type ProductType = InferSchemaType<typeof productSchema> & { _id: Types.ObjectId }
+export type ClothingType = InferSchemaType<typeof clothingSchema> & { _id: Types.ObjectId }
+export type ElectronicType = InferSchemaType<typeof electronicSchema> & { _id: Types.ObjectId }
+export type FurnitureType = InferSchemaType<typeof furnitureSchema> & { _id: Types.ObjectId }
 
 const productModel = mongoose.models[DOCUMENT_NAME_PRODUCT] || model(DOCUMENT_NAME_PRODUCT, productSchema)
 const clothingModel = mongoose.models[DOCUMENT_NAME_CLOTHING] || model(DOCUMENT_NAME_CLOTHING, clothingSchema)

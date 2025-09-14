@@ -33,6 +33,7 @@ const apiKey = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     req.objKey = objKey
+
     return next()
   } catch (error) {
     console.error(`Error: ${error}`)

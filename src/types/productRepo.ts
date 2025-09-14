@@ -1,39 +1,36 @@
 import { Model, Types } from 'mongoose'
-import { ClothingType, ProductType, ElectronicType, FurnitureType } from '~/models/product.model'
 
-export type ProductQuery = {
+export type DraftsOrPublishParams = {
   product_shop: Types.ObjectId
-  isDraft?: boolean
-  isPublished?: boolean
-}
-
-export type PaginationOptions = {
-  query: ProductQuery
-  limit: number
-  skip: number
-}
-
-export type ProductPaginationPayload = ProductQuery & {
   limit?: number
   skip?: number
 }
 
-export type ProductActionPayload = {
+export type ProductShopParams = {
   product_id: string
   product_shop: Types.ObjectId
 }
 
-export type FindAllProductsInput = {
+export type FindAllProductParams = {
   limit: number
   sort: string
   page: number
-  filter: object
+  filter: Record<string, unknown>
   select: string[]
 }
 
-export type UpdateProductInput = {
+// cách này dùng khi ít loại model
+// export type UpdateProductByIdParams = {
+//   product_id: string
+//   payload: object
+//   model: Model<ProductType | ClothingType | ElectronicType | FurnitureType>
+//   isNew?: boolean
+// }
+
+// cách này dùng khi ta muốn mở rộng nhiều model
+export type UpdateProductByIdParams<T extends Document> = {
   product_id: string
-  payload: object
-  model: Model<ProductType | ClothingType | ElectronicType | FurnitureType>
+  payload?: Record<string, unknown>
+  model: Model<T>
   isNew?: boolean
 }
