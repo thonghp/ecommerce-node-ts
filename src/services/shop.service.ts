@@ -1,4 +1,4 @@
-import shopModel, { ShopType } from '~/models/shop.model'
+import shopModel, { type ShopType } from '~/models/shop.model'
 
 type FindByEmailParams = {
   email: string

@@ -1,6 +1,6 @@
-import { ApiKeyType } from './models/apikey.model'
-import { KeyTokenType } from './models/keytoken.model'
-import { JwtUserPayload } from './types/jwtUserPayload'
+import { type ApiKeyType } from './models/apikey.model'
+import { type KeyTokenType } from './models/keytoken.model'
+import { type JwtUserPayload } from './types/jwtUserPayload'
 
 declare global {
   namespace Express {

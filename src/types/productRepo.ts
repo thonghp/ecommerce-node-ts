@@ -1,14 +1,14 @@
-import { Model, Types } from 'mongoose'
+import { Model } from 'mongoose'
+import { ProductType } from '~/models/product.model'
 
 export type DraftsOrPublishParams = {
-  product_shop: Types.ObjectId
+  product_shop: string
   limit?: number
   skip?: number
 }
-
-export type ProductShopParams = {
+export type UnOrPublishProductParams = {
   product_id: string
-  product_shop: Types.ObjectId
+  product_shop: string
 }
 
 export type FindAllProductParams = {
@@ -18,6 +18,8 @@ export type FindAllProductParams = {
   filter: Record<string, unknown>
   select: string[]
 }
+
+export type ProductInput = Omit<ProductType, 'product_shop'> & { product_shop?: string }
 
 // cách này dùng khi ít loại model
 // export type UpdateProductByIdParams = {

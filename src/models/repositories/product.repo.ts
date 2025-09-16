@@ -1,10 +1,10 @@
-import { SortOrder, Types } from 'mongoose'
-import { FindAllProductParams, ProductShopParams, UpdateProductByIdParams } from '~/types/productRepo'
-import { getSelectData, unGetSelectData } from '~/utils'
-import { productModel, ProductType } from '../product.model'
+import { type SortOrder } from 'mongoose'
+import type { FindAllProductParams, UnOrPublishProductParams, UpdateProductByIdParams } from '~/types/productRepo'
+import { convertToObjectId, getSelectData, unGetSelectData } from '~/utils'
+import { productModel, type ProductType } from '../product.model'
 
 type QueryOptions = {
-  query: Partial<ProductType>
+  query: Omit<Partial<ProductType>, 'product_shop'> & { product_shop?: string }
   limit: number
   skip: number
 }
@@ -28,11 +28,14 @@ const queryProduct = async ({ query, limit, skip }: QueryOptions) => {
     .exec()
 }
 
-const publishProductByShop = async ({ product_id, product_shop }: ProductShopParams) => {
-  const foundProduct = await productModel.findOne<ProductType>({
-    _id: Types.ObjectId.createFromHexString(product_id),
-    product_shop: product_shop
-  })
+const publishProductByShop = async ({ product_id, product_shop }: UnOrPublishProductParams) => {
+  const foundProduct = await productModel
+    .findOne<ProductType>({
+      _id: convertToObjectId(product_id),
+      product_shop: convertToObjectId(product_shop)
+    })
+    .lean()
+    .exec()
   if (!foundProduct) {
     return null
   }
@@ -45,11 +48,14 @@ const publishProductByShop = async ({ product_id, product_shop }: ProductShopPar
   return modifiedCount
 }
 
-const unpublishProductByShop = async ({ product_id, product_shop }: ProductShopParams) => {
-  const foundProduct = await productModel.findOne<ProductType>({
-    _id: Types.ObjectId.createFromHexString(product_id),
-    product_shop: product_shop
-  })
+const unpublishProductByShop = async ({ product_id, product_shop }: UnOrPublishProductParams) => {
+  const foundProduct = await productModel
+    .findOne<ProductType>({
+      _id: convertToObjectId(product_id),
+      product_shop: convertToObjectId(product_shop)
+    })
+    .lean()
+    .exec()
   if (!foundProduct) {
     return null
   }
@@ -63,7 +69,6 @@ const unpublishProductByShop = async ({ product_id, product_shop }: ProductShopP
 }
 
 const searchProductByUser = async (keySearch: string) => {
-  // const regexSearch = new RegExp(keySearch)
   const results = await productModel
     .find(
       {
@@ -74,6 +79,7 @@ const searchProductByUser = async (keySearch: string) => {
     )
     .sort({ score: { $meta: 'textScore' } })
     .lean()
+    .exec()
 
   return results
 }
@@ -89,12 +95,13 @@ const findAllProducts = async ({ limit, sort, page, filter, select }: FindAllPro
     .limit(limit)
     .select(getSelectData(select)) // mặc định _id khi nào cũng được select theo hết
     .lean()
+    .exec()
 
   return products
 }
 
 const findProduct = async ({ product_id, unselect }: { product_id: string; unselect: string[] }) => {
-  return await productModel.findById(product_id).select(unGetSelectData(unselect))
+  return await productModel.findById(product_id).select(unGetSelectData(unselect)).lean().exec()
 }
 
 const updateProductById = async <T extends Document>({

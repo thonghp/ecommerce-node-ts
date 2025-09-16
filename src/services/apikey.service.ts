@@ -1,5 +1,5 @@
 import crypto from 'node:crypto'
-import apiKeyModel, { ApiKeyType } from '~/models/apikey.model'
+import apiKeyModel, { type ApiKeyType } from '~/models/apikey.model'
 
 const createXApiKey = async (): Promise<ApiKeyType> => {
   const newKey = await apiKeyModel.create({

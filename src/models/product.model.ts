@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType, model, Schema, Types } from 'mongoose'
+import mongoose, { model, Schema, Types, type InferSchemaType } from 'mongoose'
 import slugify from 'slugify'
 
 const DOCUMENT_NAME_PRODUCT = 'Product'
@@ -79,6 +79,18 @@ const productSchema = new Schema(
 // Document middleware, run before save and create
 productSchema.pre('save', function (next) {
   this.product_slug = slugify(this.product_name, { lower: true })
+  next()
+})
+
+// run before update
+productSchema.pre('findOneAndUpdate', function (next) {
+  const update = this.getUpdate() as ProductType
+
+  if (update.product_name) {
+    update.product_slug = slugify(update.product_name, { lower: true })
+    this.setUpdate(update)
+  }
+
   next()
 })
 

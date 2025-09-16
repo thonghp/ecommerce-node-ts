@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import JWT from 'jsonwebtoken'
 import { AuthFailureError, NotFoundError } from '~/core/error.response'
 import asyncHandler from '~/helpers/asyncHandler'
 import KeyTokenService from '~/services/keytoken.service'
-import { JwtUserPayload } from '~/types/jwtUserPayload'
+import { type JwtUserPayload } from '~/types/jwtUserPayload'
 
 const HEADER = {
   API_KEY: 'x-api-key',

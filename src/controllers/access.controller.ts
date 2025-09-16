@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response } from 'express'
 import { CREATED, SuccessResponse } from '~/core/success.response'
 import AccessService from '~/services/access.service'
 

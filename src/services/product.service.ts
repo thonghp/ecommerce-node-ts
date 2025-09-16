@@ -1,15 +1,7 @@
 import { Types } from 'mongoose'
 import { BadRequestError } from '~/core/error.response'
-import {
-  clothingModel,
-  ClothingType,
-  electronicModel,
-  ElectronicType,
-  furnitureModel,
-  FurnitureType,
-  productModel,
-  ProductType
-} from '~/models/product.model'
+import type { ClothingType, ElectronicType, FurnitureType, ProductType } from '~/models/product.model'
+import { clothingModel, electronicModel, furnitureModel, productModel } from '~/models/product.model'
 import { insertInventory } from '~/models/repositories/inventory.repo'
 import {
   findAllDraftsForShop,
@@ -21,11 +13,17 @@ import {
   unpublishProductByShop,
   updateProductById
 } from '~/models/repositories/product.repo'
-import { DraftsOrPublishParams, FindAllProductParams, ProductShopParams } from '~/types/productRepo'
+import type {
+  DraftsOrPublishParams,
+  FindAllProductParams,
+  ProductInput,
+  UnOrPublishProductParams
+} from '~/types/productRepo'
 import { sanitizeAndFlatten } from '~/utils'
 
 // type constructor, type này bắt buộc khi new constructor phải giống như vậy, kể cả lớp con kế thừa
-type classRefType = new (payload: ProductType) => Product
+type classRefType = new (payload: ProductInput) => Product
+
 // ================= STRATEGY ===================
 class ProductStrategy {
   // Cách này nhanh gọn không quan tâm lớp con new constructor thế nào
@@ -39,15 +37,15 @@ class ProductStrategy {
     ProductStrategy.productRegistry[type] = classRef
   }
 
-  static async createProduct(type: string, payload: ProductType) {
-    // switch (type) {
-    //   case 'Clothing':
-    //     return await new Clothing(payload).createProduct()
-    //   case 'Electronic':
-    //     return await new Electronic(payload).createProduct()
-    //   default:
-    //     throw new BadRequestError(`Invalid product types ${type}`)
-    // }
+  // switch (type) {
+  //   case 'Clothing':
+  //     return await new Clothing(payload).createProduct()
+  //   case 'Electronic':
+  //     return await new Electronic(payload).createProduct()
+  //   default:
+  //     throw new BadRequestError(`Invalid product types ${type}`)
+  // }
+  static async createProduct(type: string, payload: ProductInput) {
     const productClass = ProductStrategy.productRegistry[type]
     if (!productClass) {
       throw new BadRequestError(`Invalid product types ${type}`)
@@ -56,7 +54,7 @@ class ProductStrategy {
     return new productClass(payload).createProduct()
   }
 
-  static async updateProduct(type: string, product_id: string, payload: ProductType) {
+  static async updateProduct(type: string, product_id: string, payload: ProductInput) {
     const productClass = ProductStrategy.productRegistry[type]
     if (!productClass) {
       throw new BadRequestError(`Invalid product types ${type}`)
@@ -77,11 +75,11 @@ class ProductStrategy {
     return await findAllPublishsForShop({ query, limit, skip })
   }
 
-  static async publishProductByShop({ product_id, product_shop }: ProductShopParams) {
+  static async publishProductByShop({ product_id, product_shop }: UnOrPublishProductParams) {
     return await publishProductByShop({ product_id, product_shop })
   }
 
-  static async unpublishProductByShop({ product_id, product_shop }: ProductShopParams) {
+  static async unpublishProductByShop({ product_id, product_shop }: UnOrPublishProductParams) {
     return await unpublishProductByShop({ product_id, product_shop })
   }
 
@@ -93,7 +91,7 @@ class ProductStrategy {
     limit = 50,
     sort = 'ctime',
     page = 1,
-    filter = { isPubished: true },
+    filter = { isPublished: true },
     select = ['product_name', 'product_price', 'product_thumb']
   }: FindAllProductParams) {
     return await findAllProducts({ limit, sort, page, filter, select })
@@ -111,7 +109,7 @@ class Product {
   product_description?: string | null
   product_price: number
   product_type: string
-  product_shop?: Types.ObjectId | null
+  product_shop?: string | null
   product_attributes: ClothingType | ElectronicType | FurnitureType
   product_quantity: number
   constructor({
@@ -123,7 +121,7 @@ class Product {
     product_shop,
     product_attributes,
     product_quantity
-  }: ProductType) {
+  }: ProductInput) {
     this.product_name = product_name
     this.product_thumb = product_thumb
     this.product_description = product_description
@@ -136,14 +134,14 @@ class Product {
 
   async createProduct(product_id?: Types.ObjectId) {
     const newProduct: ProductType = await productModel.create({ ...this, _id: product_id })
-    if (newProduct) {
-      // add product_stock in inventory
-      await insertInventory({
-        productId: newProduct._id,
-        shopId: this.product_shop,
-        stock: this.product_quantity
-      })
-    }
+    // if (newProduct) {
+    //   // add product_stock in inventory
+    //   await insertInventory({
+    //     productId: newProduct._id,
+    //     shopId: this.product_shop,
+    //     stock: this.product_quantity
+    //   })
+    // }
 
     return newProduct
   }

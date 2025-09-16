@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType, model, Schema, Types } from 'mongoose'
+import mongoose, { model, Schema, Types, type InferSchemaType } from 'mongoose'
 const DOCUMENT_NAME = 'ApiKey'
 const COLLECTION_NAME = 'ApiKeys'
 

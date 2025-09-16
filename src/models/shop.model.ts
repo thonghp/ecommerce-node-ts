@@ -1,4 +1,4 @@
-import mongoose, { InferSchemaType, model, Schema, Types } from 'mongoose'
+import mongoose, { model, Schema, Types, type InferSchemaType } from 'mongoose'
 
 const DOCUMENT_NAME = 'Shop' // name of the model used when calling model
 const COLLECTION_NAME = 'Shops' // name of the collection in mongodb

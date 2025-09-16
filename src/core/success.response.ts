@@ -1,4 +1,4 @@
-import { Response } from 'express'
+import { type Response } from 'express'
 import reasonPhrases from '~/utils/reasonPhrases'
 import statusCode from '~/utils/statusCode'
 

@@ -1,3 +1,5 @@
+import { Types } from 'mongoose'
+
 // ['a', 'b', 'c'] => { a: 1, b: 1, c: 1 }
 const getSelectData = (select: string[]) => {
   return Object.fromEntries(select.map((item) => [item, 1]))
@@ -49,11 +51,10 @@ const omitNil = <T extends object>(obj: T): Partial<T> => {
 }
 
 const convertObjectToFlatten = <T extends object>(obj: T): Record<string, unknown> => {
-  // console.log('[1]: ', obj)
   const flattened: Record<string, unknown> = {}
   Object.keys(obj).forEach((key) => {
     const value = obj[key as keyof T]
-    if (typeof value === 'object' && !Array.isArray(value)) {
+    if (typeof value === 'object' && !Array.isArray(value) && !(value instanceof Types.ObjectId)) {
       const childFlat = convertObjectToFlatten(value as object)
       Object.keys(childFlat).forEach((nestedKey) => {
         flattened[`${key}.${nestedKey}`] = childFlat[nestedKey]
@@ -63,7 +64,6 @@ const convertObjectToFlatten = <T extends object>(obj: T): Record<string, unknow
     }
   })
 
-  // console.log('[2]: ', final)
   return flattened
 }
 
@@ -75,6 +75,8 @@ const sanitizeAndFlatten = <T extends object>(obj: T): Record<string, unknown> =
   return flatObj
 }
 
+const convertToObjectId = (id: string) => Types.ObjectId.createFromHexString(id)
+
 export {
   removeNullAndUndefinedObject,
   convertObjectToFlatten,
@@ -82,5 +84,6 @@ export {
   omitNil,
   sanitizeAndFlatten,
   unGetSelectData,
-  getInstanceChain
+  getInstanceChain,
+  convertToObjectId
 }

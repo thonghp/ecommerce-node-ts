@@ -1,5 +1,6 @@
 import { Types } from 'mongoose'
-import keytokenModel, { KeyTokenType } from '~/models/keytoken.model'
+import keytokenModel, { type KeyTokenType } from '~/models/keytoken.model'
+import { convertToObjectId } from '~/utils'
 
 type CreateKey = {
   user: Types.ObjectId
@@ -47,8 +48,8 @@ class KeyTokenService {
     return await keytokenModel.findOne({ refreshTokenUsed: refreshToken }).lean<KeyTokenType>().exec()
   }
 
-  static deleteByUserId = async (userId: Types.ObjectId) => {
-    return await keytokenModel.deleteOne({ user: userId })
+  static deleteByUserId = async (userId: string) => {
+    return await keytokenModel.deleteOne({ user: convertToObjectId(userId) })
   }
 
   static updateRefreshToken = async (id: Types.ObjectId, refreshToken: string, refreshTokenUsed: string) => {

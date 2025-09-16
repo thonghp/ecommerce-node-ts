@@ -3,9 +3,9 @@ import _ from 'lodash'
 import crypto from 'node:crypto'
 import { createTokenPair } from '~/auth/authUtils'
 import { AuthFailureError, BadRequestError, ForbiddenError } from '~/core/error.response'
-import { KeyTokenType } from '~/models/keytoken.model'
+import { type KeyTokenType } from '~/models/keytoken.model'
 import shopModel from '~/models/shop.model'
-import { JwtUserPayload } from '~/types/jwtUserPayload'
+import { type JwtUserPayload } from '~/types/jwtUserPayload'
 import { createXApiKey } from './apikey.service'
 import KeyTokenService from './keytoken.service'
 import findByEmail from './shop.service'
@@ -81,7 +81,7 @@ class AccessService {
       throw new BadRequestError('Email not registered')
     }
 
-    const isPassword = bycrypt.compare(password, isExistingUser.password)
+    const isPassword = await bycrypt.compare(password, isExistingUser.password)
     if (!isPassword) {
       throw new AuthFailureError('Authentication error')
     }
@@ -90,7 +90,7 @@ class AccessService {
     const privateKey = crypto.randomBytes(64).toString('hex')
     const publicKey = crypto.randomBytes(64).toString('hex')
     const tokens = await createTokenPair({
-      payload: { userId, email },
+      payload: { userId: userId.toString(), email },
       privateKey,
       publicKey
     })
@@ -109,7 +109,7 @@ class AccessService {
   }
 
   static signup = async ({ name, email, password }: User) => {
-    const isExistingUser = await shopModel.findOne({ email }).lean()
+    const isExistingUser = await shopModel.findOne({ email }).lean().exec()
     if (isExistingUser) {
       throw new BadRequestError('Email already exists')
     }
