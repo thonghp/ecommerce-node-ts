@@ -134,14 +134,14 @@ class Product {
 
   async createProduct(product_id?: Types.ObjectId) {
     const newProduct: ProductType = await productModel.create({ ...this, _id: product_id })
-    // if (newProduct) {
-    //   // add product_stock in inventory
-    //   await insertInventory({
-    //     productId: newProduct._id,
-    //     shopId: this.product_shop,
-    //     stock: this.product_quantity
-    //   })
-    // }
+    if (newProduct) {
+      // add product_stock in inventory
+      await insertInventory({
+        productId: newProduct._id,
+        shopId: this.product_shop,
+        stock: this.product_quantity
+      })
+    }
 
     return newProduct
   }

@@ -1,5 +1,12 @@
-import { InventoryInput } from '~/types/inventoryRepo'
+import { Types } from 'mongoose'
 import inventoryModel from '../inventory.model'
+
+type InventoryInput = {
+  productId: Types.ObjectId
+  shopId?: string | null
+  stock: number
+  location?: string
+}
 
 const insertInventory = async ({ productId, shopId, stock, location = 'unknown' }: InventoryInput) => {
   return await inventoryModel.create({
