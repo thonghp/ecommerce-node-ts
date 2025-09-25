@@ -11,7 +11,7 @@ export type UnOrPublishProductParams = {
   product_shop: string
 }
 
-export type FindAllProductParams = {
+export type FindAllParams = {
   limit: number
   sort: string
   page: number

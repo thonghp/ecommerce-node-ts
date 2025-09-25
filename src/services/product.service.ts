@@ -13,12 +13,7 @@ import {
   unpublishProductByShop,
   updateProductById
 } from '~/models/repositories/product.repo'
-import type {
-  DraftsOrPublishParams,
-  FindAllProductParams,
-  ProductInput,
-  UnOrPublishProductParams
-} from '~/types/productRepo'
+import type { DraftsOrPublishParams, FindAllParams, ProductInput, UnOrPublishProductParams } from '~/types/productRepo'
 import { sanitizeAndFlatten } from '~/utils'
 
 // type constructor, type này bắt buộc khi new constructor phải giống như vậy, kể cả lớp con kế thừa
@@ -93,7 +88,7 @@ class ProductStrategy {
     page = 1,
     filter = { isPublished: true },
     select = ['product_name', 'product_price', 'product_thumb']
-  }: FindAllProductParams) {
+  }: FindAllParams) {
     return await findAllProducts({ limit, sort, page, filter, select })
   }
 

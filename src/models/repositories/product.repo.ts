@@ -1,5 +1,5 @@
 import { type SortOrder } from 'mongoose'
-import type { FindAllProductParams, UnOrPublishProductParams, UpdateProductByIdParams } from '~/types/productRepo'
+import type { FindAllParams, UnOrPublishProductParams, UpdateProductByIdParams } from '~/types/productRepo'
 import { convertToObjectId, getSelectData, unGetSelectData } from '~/utils'
 import { productModel, type ProductType } from '../product.model'
 
@@ -84,7 +84,7 @@ const searchProductByUser = async (keySearch: string) => {
   return results
 }
 
-const findAllProducts = async ({ limit, sort, page, filter, select }: FindAllProductParams) => {
+const findAllProducts = async ({ limit, sort, page, filter, select }: FindAllParams) => {
   const skip = (page - 1) * limit
   // bản thân _id cũng field string
   const sortBy: { [key: string]: SortOrder } = sort === 'ctime' ? { _id: 1 } : { _id: -1 }

@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express'
 import { CREATED, SuccessResponse } from '~/core/success.response'
 import { ProductType } from '~/models/product.model'
 import ProductService from '~/services/product.service'
-import { transformQueryProducts } from '~/utils/transformQuery'
+import { transformQuery } from '~/utils/transformQuery'
 
 class ProductController {
   createProduct = async (req: Request, res: Response, next: NextFunction) => {
@@ -64,7 +64,11 @@ class ProductController {
 
   findAllProducts = async (req: Request, res: Response, next: NextFunction) => {
     // req.query có type mặc định là ParsedQs nên không thể cast như req.body
-    const queryParam = transformQueryProducts(req.query)
+    const queryParam = transformQuery(req.query, { isPublished: true }, [
+      'product_name',
+      'product_price',
+      'product_thumb'
+    ])
     new SuccessResponse({
       message: 'get list products success!',
       metadata: await ProductService.findAllProducts(queryParam)
