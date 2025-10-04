@@ -1,5 +1,4 @@
 import type { NextFunction, Request, Response } from 'express'
-import { ParsedQs } from 'qs'
 import { CREATED, SuccessResponse } from '~/core/success.response'
 import DiscountService from '~/services/discount.service'
 import { DiscountInput } from '~/types/discountRepo'
@@ -49,7 +48,7 @@ class DiscountController {
 
   getDiscountAmount = async (req: Request, res: Response, next: NextFunction) => {
     new SuccessResponse({
-      message: 'Get list discount code success!',
+      message: 'Get discount amount success!',
       metadata: await DiscountService.getDiscountAmount({
         ...req.body
       })

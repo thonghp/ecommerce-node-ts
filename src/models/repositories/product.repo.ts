@@ -113,6 +113,13 @@ const updateProductById = async <T extends Document>({
   return await model.findByIdAndUpdate(product_id, payload, { new: isNew })
 }
 
+const getProductById = async (productId: string) => {
+  return await productModel
+    .findOne({ _id: convertToObjectId(productId) })
+    .lean<ProductType>()
+    .exec()
+}
+
 export {
   findAllDraftsForShop,
   findAllProducts,
@@ -121,5 +128,6 @@ export {
   publishProductByShop,
   searchProductByUser,
   unpublishProductByShop,
-  updateProductById
+  updateProductById,
+  getProductById
 }
