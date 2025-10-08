@@ -1,4 +1,5 @@
 import { type SortOrder } from 'mongoose'
+import { DiscountProduct } from '~/types/discountRepo'
 import type { FindAllParams, UnOrPublishProductParams, UpdateProductByIdParams } from '~/types/productRepo'
 import { convertToObjectId, getSelectData, unGetSelectData } from '~/utils'
 import { productModel, type ProductType } from '../product.model'
@@ -120,14 +121,31 @@ const getProductById = async (productId: string) => {
     .exec()
 }
 
+// Sử dụng promise all ở đây để nó chạy đồng thời chứ không đợi chạy tuần tự
+const checkProductByServer = async (products: DiscountProduct[]) => {
+  return await Promise.all(
+    products.map(async (product) => {
+      const foundProduct = await getProductById(product.productId)
+      if (foundProduct) {
+        return {
+          price: product.price,
+          quantity: product.quantity,
+          productId: product.productId
+        }
+      }
+    })
+  )
+}
+
 export {
+  checkProductByServer,
   findAllDraftsForShop,
   findAllProducts,
   findAllPublishsForShop,
   findProduct,
+  getProductById,
   publishProductByShop,
   searchProductByUser,
   unpublishProductByShop,
-  updateProductById,
-  getProductById
+  updateProductById
 }

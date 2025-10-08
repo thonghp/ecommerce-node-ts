@@ -31,8 +31,12 @@ const updateUserCartQuantity = async ({ userId, product }: UserCart) => {
   return await cartModel.findOneAndUpdate(query, updateSet, options)
 }
 
-const findUserCartById = async (userId: string) => {
+const findUserCartByUserId = async (userId: string) => {
   return await cartModel.findOne({ cart_userId: userId }).lean<CartType>().exec()
+}
+
+const findCartById = async (cartId: string) => {
+  return await cartModel.findById({ _id: cartId, cart_state: 'active' }).lean<CartType>().exec()
 }
 
 const removeUserCartProduct = async ({ userId, productId }: UserProduct) => {
@@ -48,4 +52,4 @@ const removeUserCartProduct = async ({ userId, productId }: UserProduct) => {
   return { success: true }
 }
 
-export { removeUserCartProduct, findUserCartById, createUserCart, updateUserCartQuantity }
+export { removeUserCartProduct, findUserCartByUserId, createUserCart, updateUserCartQuantity, findCartById }

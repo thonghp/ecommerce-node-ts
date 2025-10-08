@@ -4,7 +4,7 @@ import type { UpdateCart, UserCart, UserProduct } from '~/types/cartRepo'
 import { getProductById } from '~/models/repositories/product.repo'
 import {
   createUserCart,
-  findUserCartById,
+  findUserCartByUserId,
   removeUserCartProduct,
   updateUserCartQuantity
 } from '~/models/repositories/cart.repo'
@@ -64,7 +64,7 @@ class CartService {
   }
 
   static async getListUserCart(userId: string) {
-    return await findUserCartById(userId)
+    return await findUserCartByUserId(userId)
   }
 
   /*
@@ -104,7 +104,7 @@ class CartService {
 
       if (quantity === 0) {
         result = await removeUserCartProduct({ userId, productId })
-        await findUserCartById(userId)
+        await findUserCartByUserId(userId)
       } else {
         result = await updateUserCartQuantity({
           userId,
