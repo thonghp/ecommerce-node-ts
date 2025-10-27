@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { countConnect } from '../helpers/check.connect'
+import { countConnect } from '~/helpers/check.connect'
 import { dev } from '~/configs/config.mongodb'
 
 const { user, pw, dbname } = dev['db']
