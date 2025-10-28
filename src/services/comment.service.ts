@@ -1,5 +1,5 @@
-import { addComment } from '~/models/repositories/comment.repo'
-import type { CommentParams } from '~/types/commentRepo'
+import { addComment, getCommentsByParentId } from '~/models/repositories/comment.repo'
+import type { AddCommentParams, GetCommentsByIdParams } from '~/types/commentRepo'
 
 class CommentService {
   /*
@@ -7,42 +7,13 @@ class CommentService {
     Get a list of comments [user shop]
     Delete a comment [user shop admin]
   */
-  static async createComment({ productId, userId, content, parentCommentId = null }: CommentParams) {
+  static async createComment({ productId, userId, content, parentCommentId = null }: AddCommentParams) {
     return await addComment({ productId, userId, content, parentCommentId })
   }
 
-  // static async getCommentsByParentId({
-  //   productId,
-  //   parentCommentId = null,
-  //   limit = 50,
-  //   offset = 0 // skip
-  // }) {
-  //   if (parentCommentId) {
-  //     const parent = await Comment.findById(parentCommentId)
-  //     if (!parent) {
-  //       throw new NotFoundError('Not found comment for product')
-  //     }
-
-  //     const comments = await Comment.find({
-  //       comment_productId: convertToObjectId(productId),
-  //       comment_left: { $gt: parent.comment_left },
-  //       comment_right: { $lte: parent.comment_right }
-  //     })
-  //       .select({ comment_left: 1, comment_right: 1, comment_content: 1, comment_parentId: 1 })
-  //       .sort({ comment_left: 1 })
-
-  //     return comments
-  //   }
-
-  //   const comments = await Comment.find({
-  //     comment_productId: convertToObjectId(productId),
-  //     comment_parentId: parentCommentId
-  //   })
-  //     .select({ comment_left: 1, comment_right: 1, comment_content: 1, comment_parentId: 1 })
-  //     .sort({ comment_left: 1 })
-
-  //   return comments
-  // }
+  static async getCommentsByParentId({ productId, parentCommentId, limit, offset }: GetCommentsByIdParams) {
+    return await getCommentsByParentId({ productId, parentCommentId, limit, offset })
+  }
 
   // static async deleteComments({ commentId, productId }) {
   //   const foundProduct = await findProduct({ product_id: productId })

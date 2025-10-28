@@ -1,9 +1,9 @@
-import type { CommentParams } from '~/types/commentRepo'
+import type { AddCommentParams, GetCommentsByIdParams } from '~/types/commentRepo'
 import Comment from '../comment.model'
 import { convertToObjectId } from '~/utils'
 import { NotFoundError } from '~/core/error.response'
 
-const addComment = async ({ productId, userId, content, parentCommentId = null }: CommentParams) => {
+const addComment = async ({ productId, userId, content, parentCommentId = null }: AddCommentParams) => {
   // hỏi xem cách này có tương tự cách insert xuống db không hay chỉ gán tạm vô xài
   const comment = new Comment({
     comment_productId: productId,
@@ -59,4 +59,37 @@ const addComment = async ({ productId, userId, content, parentCommentId = null }
   return comment
 }
 
-export { addComment }
+const getCommentsByParentId = async ({
+  productId,
+  parentCommentId,
+  limit,
+  offset // skip
+}: GetCommentsByIdParams) => {
+  if (parentCommentId) {
+    const parent = await Comment.findById(parentCommentId)
+    if (!parent) {
+      throw new NotFoundError('Not found comment for product')
+    }
+
+    const comments = await Comment.find({
+      comment_productId: productId,
+      comment_left: { $gt: parent.comment_left },
+      comment_right: { $lte: parent.comment_right }
+    })
+      .select({ comment_left: 1, comment_right: 1, comment_content: 1, comment_parentId: 1 })
+      .sort({ comment_left: 1 })
+
+    return comments
+  }
+
+  const comments = await Comment.find({
+    comment_productId: productId,
+    comment_parentId: parentCommentId
+  })
+    .select({ comment_left: 1, comment_right: 1, comment_content: 1, comment_parentId: 1 })
+    .sort({ comment_left: 1 })
+
+  return comments
+}
+
+export { addComment, getCommentsByParentId }

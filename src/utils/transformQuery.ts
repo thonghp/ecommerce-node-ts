@@ -39,4 +39,15 @@ const transformQueryAllDiscounts = (query: ParsedQs) => {
   }
 }
 
-export { transformQuery, transformQueryAllDiscounts }
+const transformQueryAllComments = (query: ParsedQs) => {
+  const { productId, parentCommentId = null, limit = 50, offset = 0 } = query
+
+  return {
+    limit: limit ? parseInt(limit as string, 10) : 50,
+    offset: offset ? parseInt(offset as string, 10) : 0,
+    parentCommentId: parentCommentId ? (parentCommentId as string) : null,
+    productId: productId as string
+  }
+}
+
+export { transformQuery, transformQueryAllDiscounts, transformQueryAllComments }

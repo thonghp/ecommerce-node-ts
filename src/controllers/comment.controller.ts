@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express'
 
 import { SuccessResponse, CREATED } from '~/core/success.response'
 import CommentService from '~/services/comment.service'
+import { transformQueryAllComments } from '~/utils/transformQuery'
 
 class CommentController {
   createComment = async (req: Request, res: Response, next: NextFunction) => {
@@ -11,12 +12,13 @@ class CommentController {
     }).send(res)
   }
 
-  // getCommentByParentId = async (req: Request, res: Response, next: NextFunction) => {
-  //   new SuccessResponse({
-  //     message: 'get comment success',
-  //     metadata: await CommentService.getCommentsByParentId(req.query)
-  //   }).send(res)
-  // }
+  getCommentByParentId = async (req: Request, res: Response, next: NextFunction) => {
+    const queryParam = transformQueryAllComments(req.query)
+    new SuccessResponse({
+      message: 'get comment success',
+      metadata: await CommentService.getCommentsByParentId(queryParam)
+    }).send(res)
+  }
 
   // deleteComment = async (req: Request, res: Response, next: NextFunction) => {
   //   new SuccessResponse({
