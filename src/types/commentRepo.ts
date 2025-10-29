@@ -11,3 +11,8 @@ export type GetCommentsByIdParams = {
   limit: number
   offset: number
 }
+
+export type DeleteCommentParams = {
+  commentId: string
+  productId: string
+}

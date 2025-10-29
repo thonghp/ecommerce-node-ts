@@ -1,7 +1,8 @@
-import type { AddCommentParams, GetCommentsByIdParams } from '~/types/commentRepo'
+import type { AddCommentParams, DeleteCommentParams, GetCommentsByIdParams } from '~/types/commentRepo'
 import Comment from '../comment.model'
 import { convertToObjectId } from '~/utils'
 import { NotFoundError } from '~/core/error.response'
+import { findProduct } from './product.repo'
 
 const addComment = async ({ productId, userId, content, parentCommentId = null }: AddCommentParams) => {
   // hỏi xem cách này có tương tự cách insert xuống db không hay chỉ gán tạm vô xài
@@ -92,4 +93,49 @@ const getCommentsByParentId = async ({
   return comments
 }
 
-export { addComment, getCommentsByParentId }
+const deleteComments = async ({ commentId, productId }: DeleteCommentParams) => {
+  const foundProduct = await findProduct({ product_id: productId })
+  if (!foundProduct) {
+    throw new NotFoundError('Product not found')
+  }
+
+  const comment = await Comment.findById(commentId)
+  if (!comment) {
+    throw new NotFoundError('Comment not found')
+  }
+
+  const leftValue = comment.comment_left
+  const rightValue = comment.comment_right
+  // tính width
+  const width = rightValue - leftValue + 1
+  // delete all children comments
+  await Comment.deleteMany({
+    comment_productId: convertToObjectId(productId),
+    comment_left: { $gte: leftValue, $lte: rightValue }
+  })
+
+  // update all comments after the deleted comment
+  await Comment.updateMany(
+    {
+      comment_productId: convertToObjectId(productId),
+      comment_right: { $gt: rightValue }
+    },
+    {
+      $inc: { comment_right: -width }
+    }
+  )
+
+  await Comment.updateMany(
+    {
+      comment_productId: convertToObjectId(productId),
+      comment_left: { $gt: rightValue }
+    },
+    {
+      $inc: { comment_left: -width }
+    }
+  )
+
+  return true
+}
+
+export { addComment, getCommentsByParentId, deleteComments }

@@ -20,12 +20,12 @@ class CommentController {
     }).send(res)
   }
 
-  // deleteComment = async (req: Request, res: Response, next: NextFunction) => {
-  //   new SuccessResponse({
-  //     message: 'delete comment success',
-  //     metadata: await CommentService.deleteComments(req.body)
-  //   }).send(res)
-  // }
+  deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+    new SuccessResponse({
+      message: 'delete comment success',
+      metadata: await CommentService.deleteComments(req.body)
+    }).send(res)
+  }
 }
 
 export default new CommentController()
