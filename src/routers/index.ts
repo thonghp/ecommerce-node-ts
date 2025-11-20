@@ -5,6 +5,7 @@ import discountRouter from './discount'
 import cartRouter from './cart'
 import checkoutRouter from './checkout'
 import commentRouter from './comment'
+import notificationRouter from './notification'
 import { apiKey, permission } from '~/auth/checkAuth'
 
 const router = Router()
@@ -12,6 +13,7 @@ const router = Router()
 router.use(apiKey)
 router.use(permission('0000'))
 
+router.use('/v1/api/notification', notificationRouter)
 router.use('/v1/api/comment', commentRouter)
 router.use('/v1/api/checkout', checkoutRouter)
 router.use('/v1/api/cart', cartRouter)

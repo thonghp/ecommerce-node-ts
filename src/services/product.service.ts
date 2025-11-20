@@ -15,6 +15,8 @@ import {
 } from '~/models/repositories/product.repo'
 import type { DraftsOrPublishParams, FindAllParams, ProductInput, UnOrPublishProductParams } from '~/types/productRepo'
 import { sanitizeAndFlatten } from '~/utils'
+import { pushNotifyToSystem } from './notification.service'
+import { NOTIFY_TYPE } from '~/utils/constants'
 
 // type constructor, type này bắt buộc khi new constructor phải giống như vậy, kể cả lớp con kế thừa
 type classRefType = new (payload: ProductInput) => Product
@@ -136,6 +138,19 @@ class Product {
         shopId: this.product_shop,
         stock: this.product_quantity
       })
+
+      // push notify to system collection
+      pushNotifyToSystem({
+        type: NOTIFY_TYPE.NEW_PRODUCT,
+        receivedId: 1,
+        senderId: this.product_shop,
+        options: {
+          product_name: this.product_name,
+          shop_name: this.product_shop
+        }
+      })
+        .then((rs) => console.log('rs: ', rs))
+        .catch(console.error)
     }
 
     return newProduct
