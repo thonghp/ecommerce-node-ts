@@ -18,6 +18,8 @@ declare global {
       DEV_DB_USER: string
       DEV_DB_PW: string
       DEV_DB_NAME: string
+      CHANNELID_DISCORD: string
+      TOKEN_DISCORD: string
     }
   }
   // Error là interface toàn cục sẵn nên không cần sử dụng namespace

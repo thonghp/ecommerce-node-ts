@@ -7,9 +7,11 @@ import checkoutRouter from './checkout'
 import commentRouter from './comment'
 import notificationRouter from './notification'
 import { apiKey, permission } from '~/auth/checkAuth'
+// import pushToLogDiscord from '~/middlewares'
 
 const router = Router()
 
+// router.use(pushToLogDiscord)
 router.use(apiKey)
 router.use(permission('0000'))
 
