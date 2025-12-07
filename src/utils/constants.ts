@@ -1,7 +1,0 @@
-const NOTIFY_TYPE = {
-  NEW_PRODUCT: 'SHOP-001',
-  NEW_PROMOTION: 'PROMOTION-001',
-  ALL: 'ALL'
-}
-
-export { NOTIFY_TYPE }
