@@ -1,27 +1,27 @@
-import { consumerToQueue } from '~/services/consumerQueue.service'
+import { consumerToQueue, consumerToQueueFailed, consumerToQueueNormal } from '~/services/consumerQueue.service'
 
 const queueName = 'test-topic'
 
-consumerToQueue(queueName)
+// consumerToQueue(queueName)
+//   .then(() => {
+//     console.log(`Message consumer started ${queueName}`)
+//   })
+//   .catch((error) => {
+//     console.error(`message error: ${error.message}`)
+//   })
+
+consumerToQueueNormal(queueName)
   .then(() => {
-    console.log(`Message consumer started ${queueName}`)
+    console.log(`Message consumerToQueueNormal started`)
   })
   .catch((error) => {
     console.error(`message error: ${error.message}`)
   })
 
-// consumerToQueueNormal(queueName)
-//   .then(() => {
-//     console.log(`Message consumerToQueueNormal started`)
-//   })
-//   .catch((error) => {
-//     console.error(`message error: ${error.message}`)
-//   })
-
-// consumerToQueueFailed(queueName)
-//   .then(() => {
-//     console.log(`Message consumerToQueueFailed started`)
-//   })
-//   .catch((error) => {
-//     console.error(`message error: ${error.message}`)
-//   })
+consumerToQueueFailed(queueName)
+  .then(() => {
+    console.log(`Message consumerToQueueFailed started`)
+  })
+  .catch((error) => {
+    console.error(`message error: ${error.message}`)
+  })
