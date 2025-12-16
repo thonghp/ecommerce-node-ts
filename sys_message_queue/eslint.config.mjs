@@ -1,45 +1,50 @@
-import js from '@eslint/js'
 import globals from 'globals'
-import { defineConfig } from 'eslint/config'
+import pluginJs from '@eslint/js'
+import tseslint from 'typescript-eslint'
+import eslintPluginPrettier from 'eslint-plugin-prettier'
 
-export default defineConfig([
+/** @type {import('eslint').Linter.Config[]} */
+export default [
+  { ignores: ['**/node_modules/', '**/dist/'] },
+  { files: ['**/*.{js,mjs,cjs,ts}'] },
+  { languageOptions: { parser: tseslint.parser, globals: globals.browser } },
+  pluginJs.configs.recommended,
+  ...tseslint.configs.recommended,
   {
-    files: ['**/*.{js,mjs,cjs}'],
-    plugins: { js },
-    extends: ['js/recommended'],
-    rules: {
-      'no-unused-vars': 'off', // Tắt rule no-unused-vars
-      'no-unsafe-optional-chaining': 'off', // Tắt rule no-unsafe-optional-chaining
-      'no-constant-condition': 'off', // Tắt rule no-constant-condition
-      'no-useless-catch': 'off', // Tắt rule no-useless-catch
-      'no-empty': 'off', // Tắt rule no-empty
-      'no-undef': 'off',
-      curly: ['error', 'all'], // Bắt buộc dùng dấu ngoặc cho if, else, for...
-      'padding-line-between-statements': ['error', { blankLine: 'always', prev: 'if', next: '*' }]
+    plugins: {
+      prettier: eslintPluginPrettier
     },
-    languageOptions: {
-      parserOptions: {
-        ecmaVersion: 2022,
-        sourceType: 'module'
-      },
-      globals: {
-        ...globals.node // Thêm global node, bao gồm process
-      }
-    }
-  },
-  {
-    files: ['**/*.js'],
-    languageOptions: {
-      sourceType: 'commonjs',
-      globals: {
-        ...globals.node
-      }
-    }
-  },
-  {
-    files: ['**/*.{js,mjs,cjs}'],
-    languageOptions: {
-      globals: globals.browser
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'warn', // warn off
+      curly: ['error', 'all'], // bắt buộc phải có {} sau if, else, while, for, ...
+      'prettier/prettier': [
+        'warn',
+        {
+          arrowParens: 'always',
+          semi: false,
+          trailingComma: 'none',
+          tabWidth: 2,
+          endOfLine: 'auto',
+          useTabs: false,
+          singleQuote: true,
+          printWidth: 120,
+          jsxSingleQuote: true
+        }
+      ],
+      // Rule xuống dòng sau if
+      'padding-line-between-statements': [
+        'error',
+        // sau if/else, for, while,...
+        { blankLine: 'always', prev: 'block-like', next: '*' },
+        { blankLine: 'always', prev: '*', next: 'return' }
+        // { blankLine: 'always', prev: ['const', 'let', 'var'], next: '*' }
+      ],
+      'lines-between-class-members': [
+        'error',
+        'always',
+        { exceptAfterSingleLine: true } // sau các method xuống dòng
+      ]
     }
   }
-])
+]

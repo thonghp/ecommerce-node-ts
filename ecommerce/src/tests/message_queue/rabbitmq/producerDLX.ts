@@ -1,9 +1,9 @@
 import amqplib from 'amqplib'
 
-const log = console.log
-console.log = function (...args) {
-  log.apply(console, [new Date()].concat(...args))
-}
+// const log = console.log
+// console.log = function (...args) {
+//   log.apply(console, [new Date()].concat(...args))
+// }
 
 const runProducerDLX = async () => {
   try {
