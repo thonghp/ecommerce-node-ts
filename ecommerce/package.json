@@ -25,6 +25,7 @@
     "jsonwebtoken": "9.0.2",
     "lodash": "4.17.21",
     "mongoose": "8.7.0",
+    "mysql2": "^3.16.0",
     "slugify": "^1.6.6"
   },
   "devDependencies": {
