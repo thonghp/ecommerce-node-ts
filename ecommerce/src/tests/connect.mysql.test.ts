@@ -2,7 +2,7 @@ import mysql, { ResultSetHeader } from 'mysql2'
 
 const pool = mysql.createPool({
   host: 'localhost',
-  user: 'root',
+  user: 'eric', // root nếu ko tạo user
   password: '12345',
   database: 'ecommerce'
 })

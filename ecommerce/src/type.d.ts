@@ -20,6 +20,9 @@ declare global {
       DEV_DB_NAME: string
       CHANNELID_DISCORD: string
       TOKEN_DISCORD: string
+      CLOUDINARY_CLOUD_NAME: string
+      CLOUDINARY_API_KEY: string
+      CLOUDINARY_API_SECRET: string
     }
   }
   // Error là interface toàn cục sẵn nên không cần sử dụng namespace

@@ -6,6 +6,7 @@ import cartRouter from './cart'
 import checkoutRouter from './checkout'
 import commentRouter from './comment'
 import notificationRouter from './notification'
+import uploadRouter from './upload'
 import { apiKey, permission } from '~/auth/checkAuth'
 // import pushToLogDiscord from '~/middlewares'
 
@@ -15,6 +16,7 @@ const router = Router()
 router.use(apiKey)
 router.use(permission('0000'))
 
+router.use('/v1/api/upload', uploadRouter)
 router.use('/v1/api/notification', notificationRouter)
 router.use('/v1/api/comment', commentRouter)
 router.use('/v1/api/checkout', checkoutRouter)
