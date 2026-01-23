@@ -23,7 +23,6 @@ const uploadImageFromLocal = async ({ path, folderName = 'product/8409' }: { pat
       public_id: 'thumb',
       folder: folderName
     })
-    // console.log(result)
 
     return {
       image_url: result.secure_url,
@@ -39,4 +38,40 @@ const uploadImageFromLocal = async ({ path, folderName = 'product/8409' }: { pat
   }
 }
 
-export { uploadImageFromUrl, uploadImageFromLocal }
+const uploadImageFromLocalFiles = async ({
+  files,
+  folderName = 'product/8409'
+}: {
+  files: Express.Multer.File[]
+  folderName?: string
+}) => {
+  try {
+    if (!files.length) {
+      return
+    }
+
+    const uploadedUrls = await Promise.all(
+      files.map(async (file) => {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: folderName
+        })
+
+        return {
+          image_url: result.secure_url,
+          shopId: 8409,
+          thumb_url: cloudinary.url(result.public_id, {
+            width: 100,
+            height: 100,
+            format: 'jpg'
+          })
+        }
+      })
+    )
+
+    return uploadedUrls
+  } catch (error) {
+    console.error('error uploading image:;', error)
+  }
+}
+
+export { uploadImageFromUrl, uploadImageFromLocal, uploadImageFromLocalFiles }
