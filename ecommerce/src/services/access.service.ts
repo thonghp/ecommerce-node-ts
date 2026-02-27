@@ -110,7 +110,7 @@ class AccessService {
 
   static signup = async ({ name, email, password }: User) => {
     const isExistingUser = await shopModel.findOne({ email }).lean().exec()
-    if (isExistingUser) {
+    if (!isExistingUser) {
       throw new BadRequestError('Email already exists')
     }
 

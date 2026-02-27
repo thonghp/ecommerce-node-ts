@@ -1,10 +1,11 @@
-import statusCode from '~/utils/statusCode'
 import reasonPhrases from '~/utils/reasonPhrases'
+import statusCode from '~/utils/statusCode'
 
 class ErrorResponse extends Error {
   constructor(message: string, status: number) {
     super(message)
     this.status = status
+    this.now = Date.now()
   }
 }
 
@@ -32,4 +33,4 @@ class ForbiddenError extends ErrorResponse {
   }
 }
 
-export { ErrorResponse, BadRequestError, AuthFailureError, NotFoundError, ForbiddenError }
+export { AuthFailureError, BadRequestError, ErrorResponse, ForbiddenError, NotFoundError }

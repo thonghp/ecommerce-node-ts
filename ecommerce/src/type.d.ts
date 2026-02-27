@@ -9,6 +9,7 @@ declare global {
       refreshToken: string
       user: JwtUserPayload
       objKey: ApiKeyType
+      requestId: string
     }
   }
   namespace NodeJS {
@@ -23,11 +24,13 @@ declare global {
       CLOUDINARY_CLOUD_NAME: string
       CLOUDINARY_API_KEY: string
       CLOUDINARY_API_SECRET: string
+      LOG_LEVEL: string
     }
   }
   // Error là interface toàn cục sẵn nên không cần sử dụng namespace
   interface Error {
     status: number
+    now: number
   }
 }
 // đảm bảo đây là một module để ts đọc
